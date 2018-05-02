@@ -1,28 +1,42 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <PDFDocument v-bind="{src, width, scale}" />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import PDFDocument from './components/PDFDocument.vue'
 
 export default {
   name: 'app',
+
   components: {
-    HelloWorld
-  }
+    PDFDocument,
+  },
+
+  data() {
+    return {
+      src: 'https://cdn.filestackcontent.com/5qOCEpKzQldoRsVatUPS',
+      width: 750,
+      scale: 1,
+    };
+  },
 }
 </script>
 
 <style>
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #312b2b;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: #303030;
+  margin: 1em 0;
+  padding: 1em;
 }
 </style>
