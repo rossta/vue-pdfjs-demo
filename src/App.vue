@@ -21,6 +21,28 @@ export default {
       scale: 1,
     };
   },
+
+  methods: {
+    handleResize() {
+      const [LARGE, MIDDLE, SMALL] = [750, 480, 320];
+      const clientWidth = document.body.clientWidth;
+      if (clientWidth >= LARGE) {
+        this.width = LARGE;
+      } else if (clientWidth >= MIDDLE) {
+        this.width = MIDDLE;
+      } else {
+        this.width = SMALL;
+      }
+    },
+  },
+
+  mounted() {
+    window.addEventListener('resize', this.handleResize)
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize)
+  },
 }
 </script>
 
