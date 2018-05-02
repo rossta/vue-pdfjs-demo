@@ -41,8 +41,8 @@ export default {
       // PDFPageProxy#render
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       this.page.render(this.getRenderContext()).
-        then(() => log('Page rendered')).
         then(() => this.$emit('rendered', this.page)).
+        then(() => log(`Page ${this.pageNumber} rendered`)).
         catch(reason => this.$emit('errored', reason))
     },
     getRenderContext() {
