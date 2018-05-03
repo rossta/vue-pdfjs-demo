@@ -43,7 +43,16 @@ export default {
       this.page.render(this.getRenderContext()).
         then(() => this.$emit('rendered', this.page)).
         then(() => log(`Page ${this.pageNumber} rendered`)).
-        catch(reason => this.$emit('errored', reason))
+        catch(response => this.$emit(
+          'errored',
+          {text: `Failed to render page ${this.pageNumber}`, response}
+        ))
+    },
+    destroyPage(page) {
+      if (!page) return;
+      // PDFPageProxy#_destroy
+      // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
+      page._destroy();
     },
     getRenderContext() {
       const {viewport} = this;
@@ -60,20 +69,24 @@ export default {
     },
   },
 
+  watch: {
+    page(page, oldPage) {
+      this.destroyPage(oldPage);
+    },
+  },
+
   mounted() {
-    log(`PDFPage ${this.pageNumber} mounted`);
+    log(`Page ${this.pageNumber} mounted`);
     this.renderPage();
   },
 
   updated() {
-    log(`PDFPage ${this.pageNumber} updated`);
+    log(`Page ${this.pageNumber} updated`);
     this.renderPage();
   },
 
   beforeDestroy() {
-    // PDFPageProxy#_destroy
-    // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-    this.page._destroy();
+    this.destroyPage(this.page);
   },
 
   render(h) {

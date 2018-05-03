@@ -5,6 +5,7 @@
       :key="page.pageNumber"
       :page="page"
       v-bind="{scale, width}"
+      @errored="pageErrored"
     />
   </div>
 </template>
@@ -42,7 +43,7 @@ export default {
     PDFPage,
   },
   props: {
-    src: {
+    url: {
       type: String,
       required: true,
     },
@@ -55,46 +56,53 @@ export default {
       default: 700,
     },
   },
+
   data() {
     return {
       pdf: undefined,
       pages: [],
     };
   },
+
   watch: {
-    src: {
-      handler(src) {
-        this.destroyPdf();
-        getDocument(src).
+    url: {
+      handler(url) {
+        getDocument(url).
           then(pdf => (this.pdf = pdf)).
-          catch((e) => {
-            this.$emit('errored');
-            log('Failed to retrieve PDF', e);
+          catch((response) => {
+            this.$emit('errored', {text: 'Failed to retrieve PDF', response});
+            log('Failed to retrieve PDF', response);
           });
       },
       immediate: true,
     },
     pdf: {
-      handler(pdf) {
+      handler(pdf, oldPdf) {
+        this.cleanupPdf(oldPdf);
         getAllPages(pdf).
           then(pages => (this.pages = pages)).
-          catch((e) => {
-            this.$emit('errored');
-            log('Failed to retrieve pages', e);
+          then(() => log('Retrieved all pages')).
+          catch((response) => {
+            this.$emit('errored', {text: 'Failed to retrieve pages', response});
+            log('Failed to retrieve pages', response);
           });
       }
     },
   },
-  beforeDestroy() {
-    this.destroyPdf();
-  },
+
   methods: {
-    destroyPdf() {
-      if (this.pdf) {
-        this.pdf.destroy();
-        this.pdf = undefined;
+    cleanupPdf(pdf) {
+      if (pdf) {
+        pdf.cleanup();
       }
     },
+    pageErrored(error) {
+      this.$emit('errored', error);
+   },
+  },
+
+  beforeDestroy() {
+    this.cleanupPdf(this.pdf);
   },
 };
 </script>
