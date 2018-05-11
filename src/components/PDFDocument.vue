@@ -4,7 +4,7 @@
       v-for="page in pages"
       :key="page.pageNumber"
       :page="page"
-      v-bind="{scale, width}"
+      v-bind="{scale}"
       @errored="pageErrored"
     />
   </div>
@@ -50,10 +50,6 @@ export default {
     scale: {
       type: Number,
       default: 1.0,
-    },
-    width: {
-      type: Number,
-      default: 700,
     },
   },
 

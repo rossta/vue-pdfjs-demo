@@ -4,7 +4,7 @@
       :documentError="documentError"
       @updated="urlUpdated" />
     <PDFDocument
-      v-bind="{url, width, scale}"
+      v-bind="{url, scale}"
       @errored="documentErrored"
       />
   </div>
@@ -25,22 +25,21 @@ export default {
   data() {
     return {
       url: 'https://cdn.filestackcontent.com/5qOCEpKzQldoRsVatUPS',
-      width: 750,
-      scale: 1,
+      scale: 2.5,
       documentError: undefined,
     };
   },
 
   methods: {
     handleResize() {
-      const [LARGE, MIDDLE, SMALL] = [750, 480, 320];
+      const [LARGE, MIDDLE, SMALL] = [2.5, 1.5, 1];
       const clientWidth = document.body.clientWidth;
       if (clientWidth >= LARGE) {
-        this.width = LARGE;
+        this.scale = LARGE;
       } else if (clientWidth >= MIDDLE) {
-        this.width = MIDDLE;
+        this.scale = MIDDLE;
       } else {
-        this.width = SMALL;
+        this.scale = SMALL;
       }
     },
     documentErrored(e) {
