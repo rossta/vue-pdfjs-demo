@@ -67,7 +67,9 @@ export default {
   watch: {
     url: {
       handler(url) {
-        getDocument(url).
+        this.cleanup();
+        this.loadingTask = getDocument(url);
+        this.loadingTask.
           then(pdf => (this.pdf = pdf)).
           catch((response) => {
             this.$emit('errored', {text: 'Failed to retrieve PDF', response});
@@ -77,8 +79,7 @@ export default {
       immediate: true,
     },
     pdf: {
-      handler(pdf, oldPdf) {
-        this.cleanupPdf(oldPdf);
+      handler(pdf) {
         getAllPages(pdf).
           then(pages => (this.pages = pages)).
           then(() => log('Retrieved all pages')).
@@ -91,9 +92,9 @@ export default {
   },
 
   methods: {
-    cleanupPdf(pdf) {
-      if (pdf) {
-        pdf.cleanup();
+    cleanup() {
+      if (this.loadingTask) {
+        this.loadingTask.destroy();
       }
     },
     pageErrored(error) {
@@ -102,7 +103,7 @@ export default {
   },
 
   beforeDestroy() {
-    this.cleanupPdf(this.pdf);
+    this.cleanup();
   },
 };
 </script>
