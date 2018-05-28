@@ -7,12 +7,17 @@
       v-bind="{url, scale}"
       @errored="documentErrored"
       />
+    <PDFZoom
+      :scale="scale"
+      @change="scaleChanged"
+      />
   </div>
 </template>
 
 <script>
 import PDFUploader from './components/PDFUploader.vue'
 import PDFDocument from './components/PDFDocument.vue'
+import PDFZoom from './components/PDFZoom.vue'
 
 export default {
   name: 'app',
@@ -20,6 +25,7 @@ export default {
   components: {
     PDFUploader,
     PDFDocument,
+    PDFZoom,
   },
 
   data() {
@@ -47,6 +53,10 @@ export default {
     },
     urlUpdated(url) {
       this.url = url;
+    },
+    scaleChanged(scale) {
+      console.log('scale changed', scale);
+      this.scale = scale;
     },
   },
 
