@@ -1,5 +1,5 @@
 <template>
-  <div class="pdf-canvas">
+  <div class="pdf-document">
     <PDFPage
       v-for="page in pages"
       :key="page.pageNumber"
@@ -103,8 +103,3 @@ export default {
   },
 };
 </script>
-<style>
-.pdf-document {
-  margin: 1em;
-}
-</style>

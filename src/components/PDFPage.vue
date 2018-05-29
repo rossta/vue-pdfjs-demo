@@ -56,7 +56,7 @@ export default {
         // PDFPageProxy#render
         // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
         this.renderTask = this.page.render(this.getRenderContext());
-        this.renderTask
+        this.renderTask.
           then(() => this.$emit('rendered', this.page)).
           then(() => log(`Page ${this.pageNumber} rendered`)).
           catch(response => {
@@ -77,7 +77,7 @@ export default {
 
       // RenderTask#cancel
       // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
-      if (this.renderTask) this.renderingTask.cancel();
+      if (this.renderTask) this.renderTask.cancel();
     },
     getCanvasContext() {
       const canvas = this.$el;
