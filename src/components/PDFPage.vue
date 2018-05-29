@@ -18,24 +18,23 @@ export default {
 
   data() {
     return {
-      drawn: false,
+      rendered: false,
     };
   },
 
   computed: {
-    viewport() {
-      return this.getViewport(this.scale * CSS_UNITS);
+    actualSizeViewport() {
+      return this.viewport.clone({scale: this.scale * CSS_UNITS});
     },
     canvasAttrs() {
       let style = '';
       let {width, height} = this.viewport;
       [width, height] = [width, height].map(dim => Math.ceil(dim))
 
-      if (this.drawn) {
-        const pixelRatio = this.getPixelRatio();
-        const [pixelWidth, pixelHeight] = [width, height].map(dim => Math.ceil(dim / pixelRatio));
-        style = `width: ${pixelWidth}px; height: ${pixelHeight}px;`
-      }
+      const {width: actualSizeWidth, height: actualSizeHeight} = this.actualSizeViewport;
+      const pixelRatio = this.getPixelRatio();
+      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight].map(dim => Math.ceil(dim / pixelRatio));
+      style = `width: ${pixelWidth}px; height: ${pixelHeight}px;`
 
       return {
         width,
@@ -52,25 +51,33 @@ export default {
 
   methods: {
     renderPage() {
-      this.drawn = true;
-      // PDFPageProxy#render
-      // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-      this.page.render(this.getRenderContext()).
-        then(() => this.$emit('rendered', this.page)).
-        then(() => log(`Page ${this.pageNumber} rendered`)).
-        catch(response => {
-          log(`Failed to render page ${this.pageNumber}`, response);
-          this.$emit(
-            'errored',
-            {text: `Failed to render page ${this.pageNumber}`, response}
-          );
-        });
+      this.rendered = true;
+      this.$nextTick(() => {
+        // PDFPageProxy#render
+        // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
+        this.renderTask = this.page.render(this.getRenderContext());
+        this.renderTask
+          then(() => this.$emit('rendered', this.page)).
+          then(() => log(`Page ${this.pageNumber} rendered`)).
+          catch(response => {
+            log(`Failed to render page ${this.pageNumber}`, response);
+            this.$emit(
+              'errored',
+              {text: `Failed to render page ${this.pageNumber}`, response}
+            );
+          });
+      });
     },
     destroyPage(page) {
       if (!page) return;
       // PDFPageProxy#_destroy
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       page._destroy();
+
+
+      // RenderTask#cancel
+      // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
+      if (this.renderTask) this.renderingTask.cancel();
     },
     getCanvasContext() {
       const canvas = this.$el;
@@ -88,14 +95,7 @@ export default {
       return this.page.getViewport(scale);
     },
     getPixelRatio() {
-      const ctx = this.getCanvasContext();
-      let devicePixelRatio = window.devicePixelRatio || 1;
-      let backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
-                              ctx.mozBackingStorePixelRatio ||
-                              ctx.msBackingStorePixelRatio ||
-                              ctx.oBackingStorePixelRatio ||
-                              ctx.backingStorePixelRatio || 1;
-      return devicePixelRatio / backingStoreRatio;
+      return window.devicePixelRatio || 1;
     },
   },
 
@@ -103,6 +103,10 @@ export default {
     page(page, oldPage) {
       this.destroyPage(oldPage);
     },
+  },
+
+  created() {
+    this.viewport = this.getViewport(this.scale * CSS_UNITS);
   },
 
   mounted() {
