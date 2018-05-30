@@ -1,5 +1,5 @@
 <template>
-  <div class="zoom">
+  <div class="pdf-zoom">
     <a @click.prevent.stop="zoomIn">+</a>
     <a @click.prevent.stop="zoomOut">-</a>
   </div>
@@ -28,12 +28,13 @@ export default {
 </script>
 
 <style>
-.zoom {
+.pdf-zoom {
   position: fixed;
-  bottom: 10%;
-  right: 3%;
+  top: 5%;
+  left: 2%;
 }
-.zoom a {
+.pdf-zoom a {
+  float: left;
   cursor: pointer;
   display: block;
   border: 1px #333 solid;

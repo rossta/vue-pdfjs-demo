@@ -2,8 +2,8 @@
   <section class="form">
     <a href="#" class="btn" @click.prevent.stop="openPicker">Upload</a>
     <span>or</span>
-    <label class="url">Enter a PDF url
-      <input v-model="url" />
+    <label class="url">
+      <input v-model="url" placeholder="Enter a PDF url" />
     </label>
     <p v-if="error" class="error">
       {{error}}
@@ -89,7 +89,6 @@ export default {
 
 <style scoped>
 .form {
-  font-family: Monaco, 'Courier New', Courier, monospace;
   margin-bottom: 2em;
   display: block;
 }
@@ -118,7 +117,7 @@ button {
 a.btn {
   display: inline;
   padding: 0.5em 3em;
-  background: rgb(41, 177, 41);
+  background: rgb(54, 114, 160);
   border: 1px solid white;
   text-decoration: none;
   border-radius: 3px;

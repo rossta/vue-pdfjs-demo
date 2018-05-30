@@ -2,30 +2,27 @@
   <div id="app">
     <PDFUploader
       :documentError="documentError"
-      @updated="urlUpdated" />
-    <PDFDocument
-      v-bind="{url, scale}"
-      @errored="documentErrored"
+      @updated="urlUpdated"
       />
-    <PDFZoom
-      :scale="scale"
-      @change="scaleChanged"
+
+    <PDFViewer
+      v-bind="{url, scale}"
+      @document-errored="documentErrored"
+      @scale-changed="scaleChanged"
       />
   </div>
 </template>
 
 <script>
 import PDFUploader from './components/PDFUploader.vue'
-import PDFDocument from './components/PDFDocument.vue'
-import PDFZoom from './components/PDFZoom.vue'
+import PDFViewer from './components/PDFViewer.vue'
 
 export default {
   name: 'app',
 
   components: {
     PDFUploader,
-    PDFDocument,
-    PDFZoom,
+    PDFViewer,
   },
 
   data() {
@@ -48,11 +45,11 @@ export default {
         this.scale = SMALL;
       }
     },
-    documentErrored(e) {
-      this.documentError = e.text;
-    },
     urlUpdated(url) {
       this.url = url;
+    },
+    documentErrored(e) {
+      this.documentError = e.text;
     },
     scaleChanged(scale) {
       console.log('scale changed', scale);
