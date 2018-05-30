@@ -63,9 +63,7 @@ export default {
   watch: {
     url: {
       handler(url) {
-        this.cleanup();
-        this.loadingTask = getDocument(url);
-        this.loadingTask.
+        getDocument(url).
           then(pdf => (this.pdf = pdf)).
           catch((response) => {
             this.$emit('errored', {text: 'Failed to retrieve PDF', response});
@@ -96,10 +94,6 @@ export default {
     pageErrored(error) {
       this.$emit('errored', error);
    },
-  },
-
-  beforeDestroy() {
-    this.cleanup();
   },
 };
 </script>

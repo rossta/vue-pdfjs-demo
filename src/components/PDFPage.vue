@@ -14,12 +14,14 @@ export default {
       type: Number,
       required: true,
     },
-  },
-
-  data() {
-    return {
-      rendered: false,
-    };
+    scrollTop: {
+      type: Number,
+      default: 0,
+    },
+    isCurrentPage: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -51,7 +53,6 @@ export default {
 
   methods: {
     renderPage() {
-      this.rendered = true;
       this.$nextTick(() => {
         // PDFPageProxy#render
         // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
