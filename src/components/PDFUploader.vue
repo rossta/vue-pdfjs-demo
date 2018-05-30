@@ -1,5 +1,5 @@
 <template>
-  <section class="form">
+  <section class="pdf-uploader form">
     <a href="#" class="btn" @click.prevent.stop="openPicker">Upload</a>
     <span>or</span>
     <label class="url">
@@ -89,7 +89,6 @@ export default {
 
 <style scoped>
 .form {
-  margin-bottom: 2em;
   display: block;
 }
 span, label {
@@ -97,10 +96,8 @@ span, label {
   font-weight: bold;
   margin-left: 0.5em;
 }
-.form input {
-  width: 33%;
-  padding: 0.25em;
-  font-size: 1em;
+input {
+  width: 15em;
 }
 .error {
   border: 1px solid red;

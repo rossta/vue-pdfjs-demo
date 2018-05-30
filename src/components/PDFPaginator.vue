@@ -31,3 +31,13 @@ export default {
   }
 }
 </script>
+
+<style>
+.pdf-paginator {
+  color: white;
+}
+.pdf-paginator input {
+  width: 2em;
+  padding: 0.3em;
+}
+</style>

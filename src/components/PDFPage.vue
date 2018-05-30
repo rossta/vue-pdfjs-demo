@@ -132,6 +132,7 @@ export default {
 </script>
 <style>
 .pdf-page {
-  margin-bottom: 1em;
+  display: block;
+  margin: 0 auto 0.5em;
 }
 </style>

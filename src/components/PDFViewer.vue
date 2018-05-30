@@ -1,13 +1,21 @@
 <template>
   <div class="pdf-viewer">
-    <PDFPaginator
-      v-bind="{pageCount}"
-      @change="currentPageChanged"
-      />
-    <PDFZoom
-      :scale="scale"
-      @change="scaleChanged"
-      />
+    <header>
+      <PDFZoom
+        :scale="scale"
+        @change="scaleChanged"
+        class="header-item"
+        />
+
+      <PDFPaginator
+        v-bind="{pageCount}"
+        @change="currentPageChanged"
+        class="header-item"
+        />
+
+      <slot name="header"></slot>
+    </header>
+
     <PDFDocument
       v-bind="{url, scale, currentPage}"
       @fetched="pagesFetched"
@@ -62,15 +70,15 @@ export default {
 }
 </script>
 
-<style>
-.pdf-paginator {
-  color: white;
-  position: fixed;
-  top: 8%;
-  left: 10%;
+<style scoped>
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1em;
 }
-.pdf-paginator input {
-  width: 2em;
-  padding: 0.3em;
+.header-item {
+  margin: 0.25em 2.5em;
 }
 </style>

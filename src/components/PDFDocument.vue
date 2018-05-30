@@ -1,7 +1,6 @@
 <template>
   <div
     class="pdf-document"
-    :style="{height}"
     >
     <PDFPage
       v-for="page in pages"
@@ -70,12 +69,6 @@ export default {
     };
   },
 
-  computed: {
-    height() {
-      return `1000px`;
-    },
-  },
-
   watch: {
     url: {
       handler(url) {
@@ -119,5 +112,7 @@ export default {
 .pdf-document {
   position: fixed;
   overflow: scroll;
+  width: 100%;
+  height: 90%;
 }
 </style>

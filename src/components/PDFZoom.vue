@@ -28,11 +28,6 @@ export default {
 </script>
 
 <style>
-.pdf-zoom {
-  position: fixed;
-  top: 5%;
-  left: 2%;
-}
 .pdf-zoom a {
   float: left;
   cursor: pointer;

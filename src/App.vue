@@ -1,15 +1,18 @@
 <template>
   <div id="app">
-    <PDFUploader
-      :documentError="documentError"
-      @updated="urlUpdated"
-      />
 
     <PDFViewer
       v-bind="{url, scale}"
       @document-errored="documentErrored"
       @scale-changed="scaleChanged"
-      />
+      >
+      <PDFUploader
+        :documentError="documentError"
+        @updated="urlUpdated"
+        slot="header"
+        class="header-item"
+        />
+    </PDFViewer>
   </div>
 </template>
 
@@ -26,24 +29,34 @@ export default {
   },
 
   data() {
+    console.log('start scale', this.defaultResponsiveScale());
     return {
       url: 'https://cdn.filestackcontent.com/5qOCEpKzQldoRsVatUPS',
-      scale: 2.5,
+      scale: this.defaultResponsiveScale(),
       documentError: undefined,
     };
   },
 
   methods: {
-    handleResize() {
-      const [LARGE, MIDDLE, SMALL] = [2.5, 1.5, 1];
+    defaultResponsiveScale() {
+      const [LARGE, MIDDLE, SMALL] = [480, 768, 1024];
+      const RESPONSIVE_SCALES = {
+        [SMALL]: 0.85,
+        [MIDDLE]: 0.95,
+        [LARGE]: 2.5
+      };
       const clientWidth = document.body.clientWidth;
-      if (clientWidth >= LARGE) {
-        this.scale = LARGE;
-      } else if (clientWidth >= MIDDLE) {
-        this.scale = MIDDLE;
+      console.log('client width', clientWidth);
+      if (clientWidth > LARGE) {
+        return RESPONSIVE_SCALES[LARGE];
+      } else if (clientWidth > MIDDLE) {
+        return RESPONSIVE_SCALES[MIDDLE];
       } else {
-        this.scale = SMALL;
+        return RESPONSIVE_SCALES[SMALL];
       }
+    },
+    handleResize() {
+      this.scale = this.defaultResponsiveScale();
     },
     urlUpdated(url) {
       this.url = url;
@@ -80,7 +93,6 @@ body {
   text-align: center;
   color: #303030;
   margin: 1em 0;
-  padding: 1em;
 }
 label.form {
   color: white;
@@ -89,9 +101,8 @@ label.form {
   margin-bottom: 2em;
   display: block;
 }
-.form input {
-  width: 75%;
-  padding: 0.25em;
+input {
+  padding: 0.45em;
   font-size: 1em;
 }
 .error {
@@ -100,5 +111,25 @@ label.form {
   color: red;
   padding: 0.5em 3em;
   display: inline;
+}
+
+/* Smartphones (landscape) ----------- */
+@media only screen and (min-width : 321px) {
+  body {
+    font-size: 0.5em;
+  }
+}
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-width : 768px) and (max-width : 1024px) {
+  body {
+    font-size: 0.75em;
+  }
+}
+
+/* Desktop ----------- */
+@media only screen and (min-width : 1025px) {
+  body {
+    font-size: 1em;
+  }
 }
 </style>
