@@ -104,6 +104,11 @@ export default {
     page(page, oldPage) {
       this.destroyPage(oldPage);
     },
+    isCurrentPage(isCurrentPage) {
+      if (isCurrentPage) {
+        this.$emit('active', this.$el.offsetTop);
+      }
+    },
   },
 
   created() {

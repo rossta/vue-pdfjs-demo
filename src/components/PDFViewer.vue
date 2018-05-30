@@ -1,19 +1,25 @@
 <template>
   <div class="pdf-viewer">
-    <PDFDocument
-      v-bind="{url, scale}"
-      @errored="documentErrored"
+    <PDFPaginator
+      v-bind="{pageCount}"
+      @change="currentPageChanged"
       />
     <PDFZoom
       :scale="scale"
       @change="scaleChanged"
       />
+    <PDFDocument
+      v-bind="{url, scale, currentPage}"
+      @fetched="pagesFetched"
+      @errored="documentErrored"
+      />
   </div>
 </template>
 
 <script>
-import PDFDocument from './PDFDocument.vue'
-import PDFZoom from './PDFZoom.vue'
+import PDFDocument from './PDFDocument';
+import PDFPaginator from './PDFPaginator';
+import PDFZoom from './PDFZoom';
 
 export default {
   name: 'PDFViewer',
@@ -21,11 +27,19 @@ export default {
   components: {
     PDFDocument,
     PDFZoom,
+    PDFPaginator,
   },
 
   props: {
     url: String,
     scale: Number,
+  },
+
+  data() {
+    return {
+      currentPage: undefined,
+      pageCount: undefined,
+    };
   },
 
   methods: {
@@ -34,9 +48,29 @@ export default {
     },
 
     scaleChanged(scale) {
-      console.log('scale changed', scale);
       this.$emit('scale-changed', scale);
+    },
+
+    pagesFetched(pages) {
+      this.pageCount = pages.length;
+    },
+
+    currentPageChanged(pageNumber) {
+      this.currentPage = pageNumber;
     },
   },
 }
 </script>
+
+<style>
+.pdf-paginator {
+  color: white;
+  position: fixed;
+  top: 8%;
+  left: 10%;
+}
+.pdf-paginator input {
+  width: 2em;
+  padding: 0.3em;
+}
+</style>

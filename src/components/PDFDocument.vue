@@ -1,10 +1,16 @@
 <template>
-  <div class="pdf-document">
+  <div
+    class="pdf-document"
+    :style="{height}"
+    >
     <PDFPage
       v-for="page in pages"
+      v-bind="{scale}"
       :key="page.pageNumber"
       :page="page"
-      v-bind="{scale}"
+      :scrollTop="$el.scrollTop"
+      :isCurrentPage="page.pageNumber === currentPage"
+      @active="pageActive"
       @errored="pageErrored"
     />
   </div>
@@ -51,6 +57,10 @@ export default {
       type: Number,
       default: 1.0,
     },
+    currentPage: {
+      type: Number,
+      default: 1,
+    },
   },
 
   data() {
@@ -58,6 +68,12 @@ export default {
       pdf: undefined,
       pages: [],
     };
+  },
+
+  computed: {
+    height() {
+      return `1000px`;
+    },
   },
 
   watch: {
@@ -76,6 +92,7 @@ export default {
       handler(pdf) {
         getAllPages(pdf).
           then(pages => (this.pages = pages)).
+          then(() => this.$emit('fetched', this.pages)).
           then(() => log('Retrieved all pages')).
           catch((response) => {
             this.$emit('errored', {text: 'Failed to retrieve pages', response});
@@ -83,13 +100,14 @@ export default {
           });
       }
     },
+    currentPage(pageNumber) {
+      this.currentPage = pageNumber;
+    },
   },
 
   methods: {
-    cleanup() {
-      if (this.loadingTask) {
-        this.loadingTask.destroy();
-      }
+    pageActive(offsetTop) {
+      this.$el.scrollTop = offsetTop;
     },
     pageErrored(error) {
       this.$emit('errored', error);
@@ -97,3 +115,9 @@ export default {
   },
 };
 </script>
+<style>
+.pdf-document {
+  position: fixed;
+  overflow: scroll;
+}
+</style>
