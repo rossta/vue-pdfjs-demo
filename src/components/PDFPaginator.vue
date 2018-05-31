@@ -35,6 +35,7 @@ export default {
 <style>
 .pdf-paginator {
   color: white;
+  font-weight: bold;
 }
 .pdf-paginator input {
   width: 2em;
