@@ -83,6 +83,7 @@ export default {
     },
     pdf: {
       handler(pdf) {
+        this.pages = [];
         getAllPages(pdf).
           then(pages => (this.pages = pages)).
           then(() => this.$emit('fetched', this.pages)).

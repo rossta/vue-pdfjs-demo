@@ -3,7 +3,12 @@
     <a href="#" class="btn" @click.prevent.stop="openPicker">Upload</a>
     <span>or</span>
     <label class="url">
-      <input v-model="url" placeholder="Enter a PDF url" />
+      <input
+        v-model="url"
+        placeholder="Enter a PDF url"
+        @keyup.enter="validateUrl"
+        @blur="validateUrl"
+         />
     </label>
     <p v-if="error" class="error">
       {{error}}
@@ -40,25 +45,6 @@ export default {
     };
   },
   watch: {
-    url(value) {
-      const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/
-      if (!value) {
-        this.urlError = undefined;
-        return;
-      }
-
-      if (URL_REGEX.exec(value)) {
-        this.url = value;
-        this.urlError = undefined;
-      }
-      else {
-        this.url = undefined;
-        this.urlError = 'Please enter a valid url';
-      }
-      if (this.url) {
-        this.$emit('updated', this.url);
-      }
-    },
   },
   computed: {
     error() {
@@ -74,13 +60,25 @@ export default {
           maxFiles:1,
           maxSize:10240000,
         }).then(response => this.handleFilestack(response));
-      })
+      });
     },
 
     handleFilestack(response) {
       if (response.filesUploaded.length > 0) {
         const [file] = response.filesUploaded;
         this.url = file.url;
+            this.$emit('updated', this.url);
+      }
+    },
+
+    validateUrl() {
+      const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
+      if (URL_REGEX.exec(this.url)) {
+        this.urlError = undefined;
+        this.$emit('updated', this.url);
+      }
+      else {
+        this.urlError = 'Please enter a valid url';
       }
     },
   },
