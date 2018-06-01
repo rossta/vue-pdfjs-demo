@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import throttle from 'lodash/throttle'
 import PDFUploader from './components/PDFUploader.vue'
 import PDFViewer from './components/PDFViewer.vue'
 
@@ -71,11 +72,12 @@ export default {
   },
 
   mounted() {
-    window.addEventListener('resize', this.handleResize)
+    this.throttledResize = throttle(this.handleResize, 500)
+    window.addEventListener('resize', this.throttledResize, true)
   },
 
   beforeDestroy() {
-    window.removeEventListener('resize', this.handleResize)
+    if (this.throttledResize) window.removeEventListener('resize', this.throttledResize, true)
   },
 }
 </script>
