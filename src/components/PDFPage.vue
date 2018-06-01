@@ -28,15 +28,18 @@ export default {
     actualSizeViewport() {
       return this.viewport.clone({scale: this.scale * CSS_UNITS});
     },
+
+    canvasStyle() {
+      const {width: actualSizeWidth, height: actualSizeHeight} = this.actualSizeViewport;
+      const pixelRatio = window.devicePixelRatio || 1;
+      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight].map(dim => Math.ceil(dim / pixelRatio));
+      return `width: ${pixelWidth}px; height: ${pixelHeight}px;`
+    },
+
     canvasAttrs() {
-      let style = '';
       let {width, height} = this.viewport;
       [width, height] = [width, height].map(dim => Math.ceil(dim))
-
-      const {width: actualSizeWidth, height: actualSizeHeight} = this.actualSizeViewport;
-      const pixelRatio = this.getPixelRatio();
-      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight].map(dim => Math.ceil(dim / pixelRatio));
-      style = `width: ${pixelWidth}px; height: ${pixelHeight}px;`
+      const style = this.canvasStyle;
 
       return {
         width,
@@ -69,6 +72,7 @@ export default {
           });
       });
     },
+
     destroyPage(page) {
       if (!page) return;
       // PDFPageProxy#_destroy
@@ -80,23 +84,12 @@ export default {
       // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
       if (this.renderTask) this.renderTask.cancel();
     },
-    getCanvasContext() {
-      const canvas = this.$el;
-      return canvas.getContext('2d');
-    },
+
     getRenderContext() {
       const {viewport} = this;
-      const canvasContext = this.getCanvasContext();
+      const canvasContext = this.$el.getContext('2d');
 
       return {canvasContext, viewport};
-    },
-    getViewport(scale) {
-      // PDFPageProxy#getViewport
-      // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-      return this.page.getViewport(scale);
-    },
-    getPixelRatio() {
-      return window.devicePixelRatio || 1;
     },
   },
 
@@ -104,6 +97,7 @@ export default {
     page(page, oldPage) {
       this.destroyPage(oldPage);
     },
+
     isCurrentPage(isCurrentPage) {
       if (isCurrentPage) {
         this.$emit('active', this.$el.offsetTop);
@@ -112,7 +106,9 @@ export default {
   },
 
   created() {
-    this.viewport = this.getViewport(this.scale * CSS_UNITS);
+    // PDFPageProxy#getViewport
+    // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
+    this.viewport = this.page.getViewport(this.scale * CSS_UNITS);
   },
 
   mounted() {
