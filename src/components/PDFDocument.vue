@@ -1,15 +1,14 @@
 <template>
-  <div
-    class="pdf-document"
-    >
+  <div class="pdf-document">
     <PDFPage
       v-for="page in pages"
-      v-bind="{scale}"
+      v-bind="{scale, scrollTop}"
       :key="page.pageNumber"
       :page="page"
-      :scrollTop="$el.scrollTop"
       :isCurrentPage="page.pageNumber === currentPage"
-      @active="pageActive"
+      :containerBounds="elementBounds"
+      @scroll-top="updateScrollTop"
+      @page-number="updatePageNumber"
       @errored="pageErrored"
     />
   </div>
@@ -23,6 +22,7 @@
 import debug from 'debug';
 const log = debug('app:components/PDFDocument');
 
+import throttle from 'lodash/throttle';
 import PDFPage from './PDFPage';
 
 import range from 'lodash/range';
@@ -64,6 +64,7 @@ export default {
 
   data() {
     return {
+      scrollTop: 0,
       pdf: undefined,
       pages: [],
     };
@@ -100,12 +101,39 @@ export default {
   },
 
   methods: {
-    pageActive(offsetTop) {
-      this.$el.scrollTop = offsetTop;
+    updateScrollTop(scrollTop) {
+      this.$el.scrollTop = scrollTop;
+      this.handleScroll();
     },
+
+    updatePageNumber(pageNumber) {
+      this.$emit('page-number', pageNumber);
+    },
+
     pageErrored(error) {
       this.$emit('errored', error);
-   },
+    },
+
+    elementBounds() {
+      const $el = this.$el;
+      return {
+        top: $el.scrollTop,
+        bottom: $el.scrollTop + $el.clientHeight,
+      };
+    },
+
+    handleScroll() {
+      this.scrollTop = this.$el.scrollTop;
+    },
+  },
+
+  mounted() {
+    this.throttledScroll = throttle(this.handleScroll, 500)
+    window.addEventListener('scroll', this.throttledScroll, true)
+  },
+
+  beforeDestroy() {
+    if (this.throttledScroll) window.removeEventListener('scroll', this.throttledScroll, true)
   },
 };
 </script>

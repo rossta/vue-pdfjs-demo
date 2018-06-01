@@ -8,8 +8,8 @@
         />
 
       <PDFPaginator
-        v-bind="{pageCount}"
-        @change="currentPageChanged"
+        v-model="currentPage"
+        :pageCount="pageCount"
         class="header-item"
         />
 
@@ -18,6 +18,7 @@
 
     <PDFDocument
       v-bind="{url, scale, currentPage}"
+      @page-number="currentPageChanged"
       @fetched="pagesFetched"
       @errored="documentErrored"
       />

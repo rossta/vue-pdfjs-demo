@@ -22,6 +22,7 @@ export default {
       type: Boolean,
       default: false,
     },
+    containerBounds: Function,
   },
 
   computed: {
@@ -32,7 +33,8 @@ export default {
     canvasStyle() {
       const {width: actualSizeWidth, height: actualSizeHeight} = this.actualSizeViewport;
       const pixelRatio = window.devicePixelRatio || 1;
-      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight].map(dim => Math.ceil(dim / pixelRatio));
+      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight].
+        map(dim => Math.ceil(dim / pixelRatio));
       return `width: ${pixelWidth}px; height: ${pixelHeight}px;`
     },
 
@@ -89,6 +91,31 @@ export default {
 
       return {canvasContext, viewport};
     },
+
+    elementBounds() {
+      const $el = this.$el;
+      return {
+        top: $el.offsetTop,
+        bottom: $el.offsetTop + $el.clientHeight,
+      };
+    },
+
+    isElementScrollTop() {
+      const {scrollTop} = this;
+      const {top, bottom} = this.elementBounds();
+      return top <= scrollTop && bottom >= scrollTop;
+    },
+
+    isElementVisible() {
+      // const containerBounds = this.containerBounds();
+      // const elementBounds = this.elementBounds();
+
+      return true;
+      // return !(
+      //   (elementBounds.bottom < containerBounds.top && elementBounds.top < containerBounds.top) ||
+      //   (elementBounds.top > containerBounds.bottom && elementBounds.bottom > containerBounds.bottom)
+      // );
+    }
   },
 
   watch: {
@@ -97,8 +124,16 @@ export default {
     },
 
     isCurrentPage(isCurrentPage) {
-      if (isCurrentPage) {
-        this.$emit('active', this.$el.offsetTop);
+      if (isCurrentPage && !this.isElementScrollTop()) {
+        this.$emit('scroll-top', this.elementBounds().top);
+      }
+    },
+
+    scrollTop(scrollTop) {
+      const elementBounds = this.elementBounds();
+      if (this.isElementScrollTop()) {
+        log('page scroll changed', this.pageNumber);
+        this.$emit('page-number', this.pageNumber);
       }
     },
   },

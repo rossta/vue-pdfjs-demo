@@ -1,9 +1,10 @@
 <template>
   <div class="pdf-paginator">
     <input
-      v-model="currentPage"
-      :max="pageCount"
+      :value="value"
+      @input="input"
       min="1"
+      :max="pageCount"
       type="number"
       /> / <span>{{ pageCount }}</span>
   </div>
@@ -12,21 +13,19 @@
 <script>
 export default {
   props: {
+    value: Number,
     pageCount: Number,
   },
 
-  data() {
-    return {
-      currentPage: undefined,
-    };
+  methods: {
+    input(event) {
+      this.$emit('input', parseInt(event.target.value, 10));
+    },
   },
 
   watch: {
-    currentPage(page) {
-      this.$emit('change', parseInt(page, 10));
-    },
     pageCount() {
-      this.currentPage = 1;
+      this.$emit('input', 1);
     },
   }
 }
