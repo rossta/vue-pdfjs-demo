@@ -111,9 +111,12 @@ export default {
 </script>
 <style>
 .pdf-document {
-  position: fixed;
-  overflow: scroll;
+  position: absolute;
+  overflow: auto;
   width: 100%;
-  height: 90%;
+  top: 80px;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 </style>

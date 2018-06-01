@@ -112,24 +112,4 @@ input {
   padding: 0.5em 3em;
   display: inline;
 }
-
-/* Smartphones (landscape) ----------- */
-@media only screen and (min-width : 321px) {
-  body {
-    font-size: 0.5em;
-  }
-}
-/* iPads (portrait and landscape) ----------- */
-@media only screen and (min-width : 768px) and (max-width : 1024px) {
-  body {
-    font-size: 0.75em;
-  }
-}
-
-/* Desktop ----------- */
-@media only screen and (min-width : 1025px) {
-  body {
-    font-size: 1em;
-  }
-}
 </style>
