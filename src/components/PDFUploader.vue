@@ -35,7 +35,7 @@ export default {
   props: {
     documentError: {
       type: String,
-      default: ''
+      default: '',
     },
   },
   data() {
@@ -44,8 +44,7 @@ export default {
       urlError: undefined,
     };
   },
-  watch: {
-  },
+  watch: {},
   computed: {
     error() {
       return this.documentError || this.urlError;
@@ -53,13 +52,15 @@ export default {
   },
   methods: {
     openPicker() {
-      getClient().then((client) => {
-        client.pick({
-          fromSources:["local_file_system","imagesearch","facebook","instagram","dropbox"],
-          accept:[".pdf"],
-          maxFiles:1,
-          maxSize:10240000,
-        }).then(response => this.handleFilestack(response));
+      getClient().then(client => {
+        client
+          .pick({
+            fromSources: ['local_file_system', 'imagesearch', 'facebook', 'instagram', 'dropbox'],
+            accept: ['.pdf'],
+            maxFiles: 1,
+            maxSize: 10240000,
+          })
+          .then(response => this.handleFilestack(response));
       });
     },
 
@@ -67,7 +68,7 @@ export default {
       if (response.filesUploaded.length > 0) {
         const [file] = response.filesUploaded;
         this.url = file.url;
-            this.$emit('updated', this.url);
+        this.$emit('updated', this.url);
       }
     },
 
@@ -76,8 +77,7 @@ export default {
       if (URL_REGEX.exec(this.url)) {
         this.urlError = undefined;
         this.$emit('updated', this.url);
-      }
-      else {
+      } else {
         this.urlError = 'Please enter a valid url';
       }
     },
@@ -89,7 +89,8 @@ export default {
 .form {
   display: block;
 }
-span, label {
+span,
+label {
   color: white;
   font-weight: bold;
   margin-left: 0.5em;

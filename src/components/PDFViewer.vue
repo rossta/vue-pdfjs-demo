@@ -68,7 +68,7 @@ export default {
       this.currentPage = pageNumber;
     },
   },
-}
+};
 </script>
 
 <style scoped>

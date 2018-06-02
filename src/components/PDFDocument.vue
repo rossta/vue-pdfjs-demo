@@ -73,28 +73,30 @@ export default {
   watch: {
     url: {
       handler(url) {
-        getDocument(url).
-          then(pdf => (this.pdf = pdf)).
-          catch((response) => {
+        getDocument(url)
+          .then(pdf => (this.pdf = pdf))
+          .catch(response => {
             this.$emit('errored', {text: 'Failed to retrieve PDF', response});
             log('Failed to retrieve PDF', response);
           });
       },
       immediate: true,
     },
+
     pdf: {
       handler(pdf) {
         this.pages = [];
-        getAllPages(pdf).
-          then(pages => (this.pages = pages)).
-          then(() => this.$emit('fetched', this.pages)).
-          then(() => log('Retrieved all pages')).
-          catch((response) => {
+        getAllPages(pdf)
+          .then(pages => (this.pages = pages))
+          .then(() => this.$emit('fetched', this.pages))
+          .then(() => log('Retrieved all pages'))
+          .catch(response => {
             this.$emit('errored', {text: 'Failed to retrieve pages', response});
             log('Failed to retrieve pages', response);
           });
-      }
+      },
     },
+
     currentPage(pageNumber) {
       this.currentPage = pageNumber;
     },
