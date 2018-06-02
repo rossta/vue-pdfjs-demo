@@ -2,13 +2,13 @@
   <div class="pdf-document">
     <PDFPage
       v-for="page in pages"
-      v-bind="{scale, scrollTop}"
+      v-bind="{scale}"
       :key="page.pageNumber"
       :page="page"
       :isCurrentPage="page.pageNumber === currentPage"
       :containerBounds="elementBounds"
-      @scroll-top="updateScrollTop"
-      @page-number="updatePageNumber"
+      @page-top="updateScrollTop"
+      @page-focus="updatePageNumber"
       @errored="pageErrored"
     />
   </div>
@@ -64,7 +64,7 @@ export default {
 
   data() {
     return {
-      scrollTop: 0,
+      elementBounds: {},
       pdf: undefined,
       pages: [],
     };
@@ -114,7 +114,7 @@ export default {
       this.$emit('errored', error);
     },
 
-    elementBounds() {
+    getElementBounds() {
       const $el = this.$el;
       return {
         top: $el.scrollTop,
@@ -123,17 +123,18 @@ export default {
     },
 
     handleScroll() {
-      this.scrollTop = this.$el.scrollTop;
+      this.elementBounds = this.getElementBounds();
     },
   },
 
   mounted() {
-    this.throttledScroll = throttle(this.handleScroll, 500)
-    window.addEventListener('scroll', this.throttledScroll, true)
+    this.handleScroll();
+    this.throttledScroll = throttle(this.handleScroll, 500);
+    window.addEventListener('scroll', this.throttledScroll, true);
   },
 
   beforeDestroy() {
-    if (this.throttledScroll) window.removeEventListener('scroll', this.throttledScroll, true)
+    if (this.throttledScroll) window.removeEventListener('scroll', this.throttledScroll, true);
   },
 };
 </script>

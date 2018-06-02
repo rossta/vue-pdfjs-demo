@@ -2,7 +2,7 @@
 import debug from 'debug';
 const log = debug('app:vue_features/documents/components/PDFPage');
 
-const CSS_UNITS = 96.0  / 72.0;
+const CSS_UNITS = 96.0 / 72.0;
 
 export default {
   props: {
@@ -14,15 +14,14 @@ export default {
       type: Number,
       required: true,
     },
-    scrollTop: {
-      type: Number,
-      default: 0,
+    containerBounds: {
+      type: Object,
+      default: {},
     },
     isCurrentPage: {
       type: Boolean,
       default: false,
     },
-    containerBounds: Function,
   },
 
   computed: {
@@ -33,14 +32,15 @@ export default {
     canvasStyle() {
       const {width: actualSizeWidth, height: actualSizeHeight} = this.actualSizeViewport;
       const pixelRatio = window.devicePixelRatio || 1;
-      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight].
-        map(dim => Math.ceil(dim / pixelRatio));
-      return `width: ${pixelWidth}px; height: ${pixelHeight}px;`
+      const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight].map(dim =>
+        Math.ceil(dim / pixelRatio),
+      );
+      return `width: ${pixelWidth}px; height: ${pixelHeight}px;`;
     },
 
     canvasAttrs() {
       let {width, height} = this.viewport;
-      [width, height] = [width, height].map(dim => Math.ceil(dim))
+      [width, height] = [width, height].map(dim => Math.ceil(dim));
       const style = this.canvasStyle;
 
       return {
@@ -57,19 +57,29 @@ export default {
   },
 
   methods: {
-    renderPage() {
+    focusPage() {
+      if (this.isElementFocused()) {
+        this.logBoundaries('page focused');
+        this.$emit('page-focus', this.pageNumber);
+      }
+
+      if (this.isElementVisible() && !this.renderTask) {
+        this.drawPage();
+      }
+    },
+
+    drawPage() {
+      this.cancelRenderTask();
+
       // PDFPageProxy#render
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       this.renderTask = this.page.render(this.getRenderContext());
-      this.renderTask.
-        then(() => this.$emit('rendered', this.page)).
-        then(() => log(`Page ${this.pageNumber} rendered`)).
-        catch(response => {
+      this.renderTask
+        .then(() => this.$emit('rendered', this.page))
+        .then(() => log(`Page ${this.pageNumber} rendered`))
+        .catch(response => {
           log(`Failed to render page ${this.pageNumber}`, response);
-          this.$emit(
-            'errored',
-            {text: `Failed to render page ${this.pageNumber}`, response}
-          );
+          this.$emit('errored', {text: `Failed to render page ${this.pageNumber}`, response});
         });
     },
 
@@ -79,13 +89,7 @@ export default {
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       page._destroy();
 
-
-      // RenderTask#cancel
-      // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
-      if (this.renderTask) {
-        this.renderTask.cancel();
-        delete this.renderTask;
-      }
+      this.cancelRenderTask();
     },
 
     getRenderContext() {
@@ -95,7 +99,7 @@ export default {
       return {canvasContext, viewport};
     },
 
-    elementBounds() {
+    getElementBounds() {
       const $el = this.$el;
       return {
         top: $el.offsetTop,
@@ -103,22 +107,37 @@ export default {
       };
     },
 
-    isElementScrollTop() {
-      const {scrollTop} = this;
-      const {top, bottom} = this.elementBounds();
-      return top <= scrollTop && bottom >= scrollTop;
+    isElementFocused() {
+      const {top: containerTop, bottom: containerBottom} = this.containerBounds;
+      const {top, bottom} = this.getElementBounds();
+      const containerMiddle = containerTop + (containerBottom - containerTop) / 2;
+      return top <= containerMiddle && bottom >= containerMiddle;
     },
 
     isElementVisible() {
-      // const containerBounds = this.containerBounds();
-      // const elementBounds = this.elementBounds();
+      const {top: containerTop, bottom: containerBottom} = this.containerBounds;
+      const {top, bottom} = this.getElementBounds();
 
-      return true;
-      // return !(
-      //   (elementBounds.bottom < containerBounds.top && elementBounds.top < containerBounds.top) ||
-      //   (elementBounds.top > containerBounds.bottom && elementBounds.bottom > containerBounds.bottom)
-      // );
-    }
+      return !(
+        (bottom < containerTop && top < containerTop) ||
+        (top > containerBottom && bottom > containerBottom)
+      );
+    },
+
+    logBoundaries(label) {
+      const {top: containerTop, bottom: containerBottom} = this.containerBounds;
+      const {top, bottom} = this.getElementBounds();
+      log(label, {containerTop, containerBottom}, {top, bottom}, this.pageNumber);
+    },
+
+    cancelRenderTask() {
+      if (!this.renderTask) return;
+
+      // RenderTask#cancel
+      // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
+      this.renderTask.cancel();
+      delete this.renderTask;
+    },
   },
 
   watch: {
@@ -127,17 +146,18 @@ export default {
     },
 
     isCurrentPage(isCurrentPage) {
-      if (isCurrentPage && !this.isElementScrollTop()) {
-        this.$emit('scroll-top', this.elementBounds().top);
+      if (isCurrentPage && !this.isElementFocused()) {
+        const {top} = this.getElementBounds();
+        this.$emit('page-top', top);
       }
     },
 
-    scrollTop(scrollTop) {
-      const elementBounds = this.elementBounds();
-      if (this.isElementScrollTop()) {
-        log('page scroll changed', this.pageNumber);
-        this.$emit('page-number', this.pageNumber);
-      }
+    containerBounds() {
+      this.focusPage();
+    },
+
+    scale() {
+      this.focusPage();
     },
   },
 
@@ -149,7 +169,7 @@ export default {
 
   mounted() {
     log(`Page ${this.pageNumber} mounted`);
-    this.renderPage();
+    this.focusPage();
   },
 
   beforeDestroy() {
