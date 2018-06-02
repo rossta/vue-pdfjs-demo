@@ -82,7 +82,10 @@ export default {
 
       // RenderTask#cancel
       // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
-      if (this.renderTask) this.renderTask.cancel();
+      if (this.renderTask) {
+        this.renderTask.cancel();
+        delete this.renderTask;
+      }
     },
 
     getRenderContext() {
