@@ -1,12 +1,19 @@
 <template>
   <div class="pdf-zoom">
-    <a @click.prevent.stop="zoomIn">+</a>
-    <a @click.prevent.stop="zoomOut">-</a>
+    <a @click.prevent.stop="zoomIn" class="icon"><ZoomInIcon /></a>
+    <a @click.prevent.stop="zoomOut" class="icon"><ZoomOutIcon /></a>
   </div>
 </template>
 
 <script>
+import ZoomInIcon from '../assets/icon-zoom-in.svg';
+import ZoomOutIcon from '../assets/icon-zoom-out.svg';
+
 export default {
+  components: {
+    ZoomInIcon,
+    ZoomOutIcon,
+  },
   props: {
     scale: Number,
     increment: {
