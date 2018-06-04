@@ -111,4 +111,27 @@ input {
   padding: 0.5em 3em;
   display: inline;
 }
+
+a.icon {
+  cursor: pointer;
+  display: block;
+  border: 1px #333 solid;
+  background: white;
+  color: #333;
+  font-weight: bold;
+  padding: 0.25em;
+  width: 1em;
+  height: 1em;
+  font-size: 1.5em;
+}
+
+@media print {
+  body {
+    background-color: transparent;
+  }
+  #app {
+    margin: 0;
+    padding: 0;
+  }
+}
 </style>

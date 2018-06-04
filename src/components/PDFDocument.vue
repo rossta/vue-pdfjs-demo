@@ -8,8 +8,9 @@
       :isCurrentPage="page.pageNumber === currentPage"
       :containerBounds="elementBounds"
       @page-top="updateScrollTop"
-      @page-focus="updatePageNumber"
-      @errored="pageErrored"
+      @page-focus="handlePageFocus"
+      @page-rendered="pageRendered"
+      @page-errored="pageErrored"
     />
   </div>
 </template>
@@ -22,10 +23,11 @@
 import debug from 'debug';
 const log = debug('app:components/PDFDocument');
 
-import throttle from 'lodash/throttle';
-import PDFPage from './PDFPage';
-
 import range from 'lodash/range';
+import throttle from 'lodash/throttle';
+
+import deferredPromise from '../utils/deferredPromise';
+import PDFPage from './PDFPage';
 
 function getDocument(src) {
   // Using import statement in this way allows Webpack
@@ -83,18 +85,30 @@ export default {
       immediate: true,
     },
 
-    pdf: {
-      handler(pdf) {
-        this.pages = [];
-        getAllPages(pdf)
-          .then(pages => (this.pages = pages))
-          .then(() => this.$emit('fetched', this.pages))
-          .then(() => log('Retrieved all pages'))
-          .catch(response => {
-            this.$emit('errored', {text: 'Failed to retrieve pages', response});
-            log('Failed to retrieve pages', response);
-          });
-      },
+    pdf(pdf) {
+      this.pages = [];
+      getAllPages(pdf)
+        .then(pages => (this.pages = pages))
+        .then(() => this.$emit('pages-fetched', this.pages))
+        .then(() => log('Retrieved all pages'))
+        .catch(response => {
+          this.$emit('document-errored', {text: 'Failed to retrieve pages', response});
+          log('Failed to retrieve pages', response);
+        });
+    },
+
+    pages(pages) {
+      const promises = pages.map((page) => {
+        page._renderPromise = deferredPromise();
+        return page._renderPromise;
+      });
+      Promise.all(promises)
+        .then(() => this.$emit('document-rendered'))
+        .then(() => log('Rendered all pages'))
+        .catch(response => {
+          this.$emit('document-errored', {text: 'Failed to render pages', response});
+          log('Failed to render pages', response);
+        });
     },
 
     currentPage(pageNumber) {
@@ -108,8 +122,12 @@ export default {
       this.handleScroll();
     },
 
-    updatePageNumber(pageNumber) {
-      this.$emit('page-number', pageNumber);
+    handlePageFocus(pageNumber) {
+      this.$emit('page-focus', pageNumber);
+    },
+
+    pageRendered(page) {
+      page._renderPromise.resolve(page);
     },
 
     pageErrored(error) {
@@ -149,5 +167,10 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
+}
+@media print {
+  .pdf-document {
+    position: static;
+  }
 }
 </style>

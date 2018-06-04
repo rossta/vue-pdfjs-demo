@@ -16,7 +16,7 @@ export default {
     },
     containerBounds: {
       type: Object,
-      default: {},
+      default: () => ({}),
     },
     isCurrentPage: {
       type: Boolean,
@@ -75,11 +75,11 @@ export default {
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       this.renderTask = this.page.render(this.getRenderContext());
       this.renderTask
-        .then(() => this.$emit('rendered', this.page))
+        .then(() => this.$emit('page-rendered', this.page))
         .then(() => log(`Page ${this.pageNumber} rendered`))
         .catch(response => {
           log(`Failed to render page ${this.pageNumber}`, response);
-          this.$emit('errored', {text: `Failed to render page ${this.pageNumber}`, response});
+          this.$emit('page-errored', {text: `Failed to render page ${this.pageNumber}`, response});
         });
     },
 
