@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import deferredPromise from '../utils/deferredPromise';
 import PDFDocument from './PDFDocument';
 import PDFPaginator from './PDFPaginator';
 import PDFZoom from './PDFZoom';
@@ -46,12 +47,20 @@ export default {
 
   data() {
     return {
+      renderPromise: deferredPromise(),
       currentPage: undefined,
       pageCount: undefined,
+      rendered: false,
+      force: false,
     };
   },
 
   methods: {
+    documentRendered() {
+      console.log('document rendered'); // eslint-disable-line
+      this.renderPromise.resolve();
+    },
+
     documentErrored(e) {
       this.$emit('document-errored', e);
     },
@@ -68,6 +77,14 @@ export default {
       this.currentPage = pageNumber;
     },
   },
+
+  watch: {
+    url: {
+      handler() {
+        this.renderPromise = deferredPromise();
+      },
+    },
+  },
 };
 </script>
 
@@ -81,5 +98,11 @@ header {
 }
 .header-item {
   margin: 0.25em 2.5em;
+}
+
+@media print {
+  header {
+    display: none;
+  }
 }
 </style>
