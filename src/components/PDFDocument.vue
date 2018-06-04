@@ -2,7 +2,7 @@
   <div class="pdf-document">
     <PDFPage
       v-for="page in pages"
-      v-bind="{scale}"
+      v-bind="{scale, force}"
       :key="page.pageNumber"
       :page="page"
       :isCurrentPage="page.pageNumber === currentPage"
@@ -62,6 +62,10 @@ export default {
       type: Number,
       default: 1,
     },
+    force: {
+      type: Boolean,
+      default: false,
+    }
   },
 
   data() {

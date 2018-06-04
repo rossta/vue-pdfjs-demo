@@ -13,21 +13,31 @@
         class="header-item"
         />
 
+      <PDFPrint
+        @print="handlePrint"
+        v-bind="{renderPromise}"
+        class="header-item"
+        />
+
       <slot name="header"></slot>
     </header>
 
     <PDFDocument
-      v-bind="{url, scale, currentPage}"
-      @page-number="currentPageChanged"
-      @fetched="pagesFetched"
-      @errored="documentErrored"
+      v-bind="{url, scale, currentPage, force}"
+      @page-focus="currentPageChanged"
+      @pages-fetched="pagesFetched"
+      @document-errored="documentErrored"
+      @document-rendered="documentRendered"
       />
   </div>
 </template>
 
 <script>
+import deferredPromise from '../utils/deferredPromise';
+
 import PDFDocument from './PDFDocument';
 import PDFPaginator from './PDFPaginator';
+import PDFPrint from './PDFPrint';
 import PDFZoom from './PDFZoom';
 
 export default {
@@ -35,6 +45,7 @@ export default {
 
   components: {
     PDFDocument,
+    PDFPrint,
     PDFZoom,
     PDFPaginator,
   },
@@ -74,6 +85,10 @@ export default {
 
     currentPageChanged(pageNumber) {
       this.currentPage = pageNumber;
+    },
+
+    handlePrint() {
+      this.force = true;
     },
   },
 

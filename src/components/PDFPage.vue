@@ -22,6 +22,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    force: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -63,7 +67,7 @@ export default {
         this.$emit('page-focus', this.pageNumber);
       }
 
-      if (this.isElementVisible() && !this.renderTask) {
+      if (this.shouldDrawPage()) {
         this.drawPage();
       }
     },
@@ -122,6 +126,10 @@ export default {
         (bottom < containerTop && top < containerTop) ||
         (top > containerBottom && bottom > containerBottom)
       );
+    },
+
+    shouldDrawPage() {
+      return this.force || (this.isElementVisible() && !this.renderTask);
     },
 
     logBoundaries(label) {
