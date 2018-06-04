@@ -1,7 +1,12 @@
 module.exports = {
-  devServer: {
-    watchOptions: {
-      poll: true,
+  configureWebpack: {
+    devServer: {
+      watchOptions: {
+        poll: true,
+      },
+    },
+    output: {
+      globalObject: "this",
     },
   },
 };

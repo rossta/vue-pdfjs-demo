@@ -30,7 +30,6 @@ export default {
   },
 
   data() {
-    console.log('start scale', this.defaultResponsiveScale());
     return {
       url: 'https://cdn.filestackcontent.com/5qOCEpKzQldoRsVatUPS',
       scale: this.defaultResponsiveScale(),
@@ -47,7 +46,6 @@ export default {
         [LARGE]: 2.5
       };
       const clientWidth = document.body.clientWidth;
-      console.log('client width', clientWidth);
       if (clientWidth > LARGE) {
         return RESPONSIVE_SCALES[LARGE];
       } else if (clientWidth > MIDDLE) {
@@ -66,7 +64,6 @@ export default {
       this.documentError = e.text;
     },
     scaleChanged(scale) {
-      console.log('scale changed', scale);
       this.scale = scale;
     },
   },
