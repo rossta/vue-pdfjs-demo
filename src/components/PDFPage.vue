@@ -18,7 +18,7 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    isCurrentPage: {
+    isFocusedPage: {
       type: Boolean,
       default: false,
     },
@@ -144,8 +144,8 @@ export default {
       this.destroyPage(oldPage);
     },
 
-    isCurrentPage(isCurrentPage) {
-      if (isCurrentPage && !this.isElementFocused()) {
+    isFocusedPage(isFocusedPage) {
+      if (isFocusedPage && !this.isElementFocused()) {
         const {top} = this.getElementBounds();
         this.$emit('page-top', top);
       }

@@ -1,11 +1,11 @@
 <template>
   <div class="pdf-document">
     <PDFPage
-      v-for="page in pages"
+      v-for="page in visiblePages"
       v-bind="{scale}"
       :key="page.pageNumber"
       :page="page"
-      :isCurrentPage="page.pageNumber === currentPage"
+      :isFocusedPage="page.pageNumber === focusedPage"
       :containerBounds="elementBounds"
       @page-top="handleScrollTop"
       @page-focus="handlePageFocus"
@@ -28,6 +28,8 @@ import throttle from 'lodash/throttle';
 
 import deferredPromise from '../utils/deferredPromise';
 import PDFPage from './PDFPage';
+
+const BUFFER_LENGTH = 3;
 
 function getDocument(url) {
   // Using import statement in this way allows Webpack
@@ -66,9 +68,12 @@ export default {
 
   data() {
     return {
-      elementBounds: {},
       pdf: undefined,
       pages: [],
+      focusedPage: undefined,
+      elementBounds: {},
+      visiblePages: [],
+      isBottomVisible: false,
     };
   },
 
@@ -87,12 +92,22 @@ export default {
 
     pdf(pdf) {
       this.pages = [];
+      this.visiblePages = [];
       getAllPages(pdf)
         .then(pages => this.updatePages(pages))
         .catch(response => {
           this.$emit('document-errored', {text: 'Failed to retrieve pages', response});
           log('Failed to retrieve pages', response);
         });
+    },
+
+    currentPage(currentPage) {
+      this.updateVisiblePages(currentPage);
+      this.$nextTick(() => (this.focusedPage = currentPage));
+    },
+
+    isBottomVisible(isBottomVisible) {
+      if (isBottomVisible) this.updateVisiblePages();
     },
   },
 
@@ -115,6 +130,7 @@ export default {
 
       log('Retrieved all pages');
       this.pages = pages;
+      this.visiblePages = pages.slice(0, BUFFER_LENGTH);
       this.$emit('pages-fetched', this.pages);
     },
 
@@ -128,7 +144,11 @@ export default {
     },
 
     handleScroll() {
-      this.elementBounds = this.getElementBounds();
+      const elementBounds = this.getElementBounds();
+      this.elementBounds = elementBounds;
+
+      const {bottom, height, scrollHeight} = elementBounds;
+      this.isBottomVisible = bottom >= scrollHeight || height > scrollHeight;
     },
 
     determineInitialScale(page) {
@@ -154,7 +174,18 @@ export default {
         bottom: $el.scrollTop + $el.clientHeight,
         height: $el.clientHeight,
         width: $el.clientWidth,
+        scrollHeight: $el.scrollHeight,
       };
+    },
+
+    updateVisiblePages(currentPage) {
+      const visibleCount = this.visiblePages.length;
+      const totalPages = currentPage || this.pages.length;
+
+      if (visibleCount < totalPages) {
+        const buffer = currentPage ? currentPage - visibleCount : BUFFER_LENGTH;
+        this.visiblePages.splice(visibleCount, 0, ...this.pages.slice(visibleCount, visibleCount+buffer));
+      }
     },
   },
 
