@@ -18,7 +18,7 @@
 
     <PDFDocument
       v-bind="{url, scale, currentPage}"
-      @page-focus="currentPageChanged"
+      @page-focus="pageFocused"
       @pages-fetched="pagesFetched"
       @document-rendered="documentRendered"
       @document-errored="documentErrored"
@@ -58,7 +58,6 @@ export default {
 
   methods: {
     documentRendered() {
-      console.log('document rendered'); // eslint-disable-line
       this.renderPromise.resolve();
     },
 
@@ -74,16 +73,14 @@ export default {
       this.pageCount = pages.length;
     },
 
-    currentPageChanged(pageNumber) {
+    pageFocused(pageNumber) {
       this.currentPage = pageNumber;
     },
   },
 
   watch: {
-    url: {
-      handler() {
-        this.renderPromise = deferredPromise();
-      },
+    url() {
+      this.renderPromise = deferredPromise();
     },
   },
 };

@@ -29,13 +29,13 @@ import throttle from 'lodash/throttle';
 import deferredPromise from '../utils/deferredPromise';
 import PDFPage from './PDFPage';
 
-function getDocument(src) {
+function importPDFJS() {
   // Using import statement in this way allows Webpack
   // to treat pdf.js as an async dependency so we can
   // avoid adding it to one of the main bundles
   return import(
     /* webpackChunkName: 'pdfjs-dist' */
-    'pdfjs-dist/webpack').then(pdfjs => pdfjs.getDocument(src));
+    'pdfjs-dist/webpack');
 }
 
 // pdf: instance of PDFDocumentProxy
@@ -75,7 +75,7 @@ export default {
   watch: {
     url: {
       handler(url) {
-        getDocument(url)
+        this.getDocument(url)
           .then(pdf => (this.pdf = pdf))
           .catch(response => {
             this.$emit('document-errored', {text: 'Failed to retrieve PDF', response});
@@ -113,6 +113,17 @@ export default {
   },
 
   methods: {
+    getDocument(url) {
+      if (this.loadingTask) {
+        this.loadingTask.destroy();
+        delete this.loadingTask;
+      }
+      return importPDFJS().then(pdfjs => {
+        this.loadingTask = pdfjs.getDocument(url);
+        return this.loadingTask;
+      });
+    },
+
     updateScrollTop(scrollTop) {
       this.$el.scrollTop = scrollTop;
       this.handleScroll();
