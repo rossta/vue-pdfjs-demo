@@ -18,9 +18,10 @@
 
     <PDFDocument
       v-bind="{url, scale, currentPage}"
-      @page-number="currentPageChanged"
-      @fetched="pagesFetched"
-      @errored="documentErrored"
+      @page-focus="currentPageChanged"
+      @pages-fetched="pagesFetched"
+      @document-rendered="documentRendered"
+      @document-errored="documentErrored"
       />
   </div>
 </template>

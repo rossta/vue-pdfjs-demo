@@ -78,7 +78,7 @@ export default {
         getDocument(url)
           .then(pdf => (this.pdf = pdf))
           .catch(response => {
-            this.$emit('errored', {text: 'Failed to retrieve PDF', response});
+            this.$emit('document-errored', {text: 'Failed to retrieve PDF', response});
             log('Failed to retrieve PDF', response);
           });
       },
@@ -109,10 +109,6 @@ export default {
           this.$emit('document-errored', {text: 'Failed to render pages', response});
           log('Failed to render pages', response);
         });
-    },
-
-    currentPage(pageNumber) {
-      this.currentPage = pageNumber;
     },
   },
 
