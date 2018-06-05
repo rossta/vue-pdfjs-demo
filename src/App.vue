@@ -34,7 +34,8 @@ export default {
 
   data() {
     return {
-      url: 'https://cdn.filestackcontent.com/5qOCEpKzQldoRsVatUPS',
+      // url: 'https://cdn.filestackcontent.com/5qOCEpKzQldoRsVatUPS',
+      url: 'https://cdn.filestackcontent.com/Lh8QNlpoR3eEDknFJ0RA',
       scale: this.defaultResponsiveScale(),
       documentError: undefined,
     };
