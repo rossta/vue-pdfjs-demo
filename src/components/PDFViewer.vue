@@ -33,6 +33,11 @@ import PDFDocument from './PDFDocument';
 import PDFPaginator from './PDFPaginator';
 import PDFZoom from './PDFZoom';
 
+function round(value, precision) {
+  const multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
+}
+
 export default {
   name: 'PDFViewer',
 
@@ -44,16 +49,16 @@ export default {
 
   props: {
     url: String,
-    scale: Number,
   },
 
   data() {
     return {
-      renderPromise: deferredPromise(),
+      scale: undefined,
       currentPage: undefined,
       pageCount: undefined,
       rendered: false,
       force: false,
+      renderPromise: deferredPromise(),
     };
   },
 
@@ -67,7 +72,7 @@ export default {
     },
 
     scaleChanged(scale) {
-      this.$emit('scale-changed', scale);
+      this.scale = round(scale, 1);
     },
 
     pagesFetched(pages) {

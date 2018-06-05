@@ -2,7 +2,7 @@
 import debug from 'debug';
 const log = debug('app:vue_features/documents/components/PDFPage');
 
-const CSS_UNITS = 96.0 / 72.0;
+import {PIXEL_RATIO} from '../utils/constants';
 
 export default {
   props: {
@@ -26,14 +26,13 @@ export default {
 
   computed: {
     actualSizeViewport() {
-      return this.viewport.clone({scale: this.scale * CSS_UNITS});
+      return this.viewport.clone({scale: this.scale});
     },
 
     canvasStyle() {
       const {width: actualSizeWidth, height: actualSizeHeight} = this.actualSizeViewport;
-      const pixelRatio = window.devicePixelRatio || 1;
       const [pixelWidth, pixelHeight] = [actualSizeWidth, actualSizeHeight]
-        .map(dim => Math.ceil(dim / pixelRatio));
+        .map(dim => Math.ceil(dim / PIXEL_RATIO));
       return `width: ${pixelWidth}px; height: ${pixelHeight}px;`;
     },
 
@@ -163,7 +162,7 @@ export default {
   created() {
     // PDFPageProxy#getViewport
     // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-    this.viewport = this.page.getViewport(this.scale * CSS_UNITS);
+    this.viewport = this.page.getViewport(this.scale);
   },
 
   mounted() {

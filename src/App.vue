@@ -2,9 +2,8 @@
   <div id="app">
 
     <PDFViewer
-      v-bind="{url, scale}"
+      v-bind="{url}"
       @document-errored="documentErrored"
-      @scale-changed="scaleChanged"
       >
       <PDFUploader
         :documentError="documentError"
@@ -17,10 +16,6 @@
 </template>
 
 <script>
-import debug from 'debug';
-const log = debug('app:App');
-
-import throttle from 'lodash/throttle'
 import PDFUploader from './components/PDFUploader.vue'
 import PDFViewer from './components/PDFViewer.vue'
 
@@ -34,53 +29,21 @@ export default {
 
   data() {
     return {
-      // url: 'https://cdn.filestackcontent.com/5qOCEpKzQldoRsVatUPS',
-      url: 'https://cdn.filestackcontent.com/Lh8QNlpoR3eEDknFJ0RA',
-      scale: this.defaultResponsiveScale(),
+      url: 'https://cdn.filestackcontent.com/5qOCEpKzQldoRsVatUPS',
+      // url: 'https://cdn.filestackcontent.com/Lh8QNlpoR3eEDknFJ0RA',
       documentError: undefined,
     };
   },
 
   methods: {
-    defaultResponsiveScale() {
-      const [LARGE, MIDDLE, SMALL] = [480, 768, 1024];
-      const RESPONSIVE_SCALES = {
-        [SMALL]: 0.85,
-        [MIDDLE]: 0.95,
-        [LARGE]: 2.5
-      };
-      const clientWidth = document.body.clientWidth;
-      if (clientWidth > LARGE) {
-        return RESPONSIVE_SCALES[LARGE];
-      } else if (clientWidth > MIDDLE) {
-        return RESPONSIVE_SCALES[MIDDLE];
-      } else {
-        return RESPONSIVE_SCALES[SMALL];
-      }
-    },
-    handleResize() {
-      this.scale = this.defaultResponsiveScale();
-    },
     urlUpdated(url) {
       this.url = url;
     },
     documentErrored(e) {
       this.documentError = e.text;
     },
-    scaleChanged(scale) {
-      log('scale changed', scale);
-      this.scale = scale;
-    },
   },
 
-  mounted() {
-    this.throttledResize = throttle(this.handleResize, 500)
-    window.addEventListener('resize', this.throttledResize, true)
-  },
-
-  beforeDestroy() {
-    if (this.throttledResize) window.removeEventListener('resize', this.throttledResize, true)
-  },
 }
 </script>
 

@@ -26,6 +26,7 @@ const log = debug('app:components/PDFDocument');
 import range from 'lodash/range';
 import throttle from 'lodash/throttle';
 
+import {PIXEL_RATIO} from '../utils/constants';
 import deferredPromise from '../utils/deferredPromise';
 import PDFPage from './PDFPage';
 
@@ -45,6 +46,23 @@ function getDocument(url) {
 function getAllPages(pdf) {
   const allPages = range(1, pdf.numPages).map(number => pdf.getPage(number));
   return Promise.all(allPages);
+}
+
+function getScaleFactor() {
+  const [LARGE, MIDDLE, SMALL] = [480, 768, 1024];
+  const SCALE_FACTORS = {
+    [SMALL]: 0.95,
+    [MIDDLE]: 0.75,
+    [LARGE]: 0.60,
+  };
+  const clientWidth = document.body.clientWidth;
+  if (clientWidth > LARGE) {
+    return SCALE_FACTORS[LARGE];
+  } else if (clientWidth > MIDDLE) {
+    return SCALE_FACTORS[MIDDLE];
+  } else {
+    return SCALE_FACTORS[SMALL];
+  }
 }
 
 export default {
@@ -113,7 +131,7 @@ export default {
 
   methods: {
     updatePages(pages) {
-      if (pages.length) this.determineInitialScale(pages[0]);
+      if (pages.length) this.updateScale(pages[0]);
 
       const promises = pages.map((page) => {
         page._renderPromise = deferredPromise();
@@ -151,10 +169,17 @@ export default {
       this.isBottomVisible = bottom >= scrollHeight || height > scrollHeight;
     },
 
-    determineInitialScale(page) {
+    handleResize() {
+      if (this.pages.length) {
+        this.updateScale(this.pages[0]);
+      }
+    },
+
+    updateScale(page) {
       const {width} = this.getElementBounds();
       const defaultViewport = page.getViewport(1.0);
-      const pageWidthScale = width / defaultViewport.width;
+      const pageWidthScale = (width * PIXEL_RATIO) * getScaleFactor() / defaultViewport.width;
+
       log('calculating initial scale', width, defaultViewport.width, pageWidthScale);
       this.$emit('scale-change', pageWidthScale);
     },
@@ -193,10 +218,14 @@ export default {
     this.handleScroll();
     this.throttledScroll = throttle(this.handleScroll, 500);
     window.addEventListener('scroll', this.throttledScroll, true);
+
+    this.throttledResize = throttle(this.handleResize, 500)
+    window.addEventListener('resize', this.handleResize, true)
   },
 
   beforeDestroy() {
     if (this.throttledScroll) window.removeEventListener('scroll', this.throttledScroll, true);
+    if (this.throttledResize) window.removeEventListener('resize', this.throttledResize, true);
   },
 };
 </script>
