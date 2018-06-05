@@ -15,7 +15,10 @@ export default {
     ZoomOutIcon,
   },
   props: {
-    scale: Number,
+    scale: {
+      type: Number,
+      default: 1,
+    },
     increment: {
       type: Number,
       default: 0.25,

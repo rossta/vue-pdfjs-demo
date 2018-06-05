@@ -7,7 +7,7 @@
       :page="page"
       :isCurrentPage="page.pageNumber === currentPage"
       :containerBounds="elementBounds"
-      @page-top="updateScrollTop"
+      @page-top="handleScrollTop"
       @page-focus="handlePageFocus"
       @page-rendered="pageRendered"
       @page-errored="pageErrored"
@@ -29,13 +29,13 @@ import throttle from 'lodash/throttle';
 import deferredPromise from '../utils/deferredPromise';
 import PDFPage from './PDFPage';
 
-function importPDFJS() {
+function getDocument(url) {
   // Using import statement in this way allows Webpack
   // to treat pdf.js as an async dependency so we can
   // avoid adding it to one of the main bundles
   return import(
     /* webpackChunkName: 'pdfjs-dist' */
-    'pdfjs-dist/webpack');
+    'pdfjs-dist/webpack').then(pdfjs => pdfjs.getDocument(url));
 }
 
 // pdf: instance of PDFDocumentProxy
@@ -75,7 +75,7 @@ export default {
   watch: {
     url: {
       handler(url) {
-        this.getDocument(url)
+        getDocument(url)
           .then(pdf => (this.pdf = pdf))
           .catch(response => {
             this.$emit('document-errored', {text: 'Failed to retrieve PDF', response});
@@ -88,20 +88,23 @@ export default {
     pdf(pdf) {
       this.pages = [];
       getAllPages(pdf)
-        .then(pages => (this.pages = pages))
-        .then(() => this.$emit('pages-fetched', this.pages))
-        .then(() => log('Retrieved all pages'))
+        .then(pages => this.updatePages(pages))
         .catch(response => {
           this.$emit('document-errored', {text: 'Failed to retrieve pages', response});
           log('Failed to retrieve pages', response);
         });
     },
+  },
 
-    pages(pages) {
+  methods: {
+    updatePages(pages) {
+      if (pages.length) this.determineInitialScale(pages[0]);
+
       const promises = pages.map((page) => {
         page._renderPromise = deferredPromise();
         return page._renderPromise;
       });
+
       Promise.all(promises)
         .then(() => this.$emit('document-rendered'))
         .then(() => log('Rendered all pages'))
@@ -109,28 +112,31 @@ export default {
           this.$emit('document-errored', {text: 'Failed to render pages', response});
           log('Failed to render pages', response);
         });
-    },
-  },
 
-  methods: {
-    getDocument(url) {
-      if (this.loadingTask) {
-        this.loadingTask.destroy();
-        delete this.loadingTask;
-      }
-      return importPDFJS().then(pdfjs => {
-        this.loadingTask = pdfjs.getDocument(url);
-        return this.loadingTask;
-      });
+      log('Retrieved all pages');
+      this.pages = pages;
+      this.$emit('pages-fetched', this.pages);
     },
 
-    updateScrollTop(scrollTop) {
+    handleScrollTop(scrollTop) {
       this.$el.scrollTop = scrollTop;
       this.handleScroll();
     },
 
     handlePageFocus(pageNumber) {
       this.$emit('page-focus', pageNumber);
+    },
+
+    handleScroll() {
+      this.elementBounds = this.getElementBounds();
+    },
+
+    determineInitialScale(page) {
+      const {width} = this.getElementBounds();
+      const defaultViewport = page.getViewport(1.0);
+      const pageWidthScale = width / defaultViewport.width;
+      log('calculating initial scale', width, defaultViewport.width, pageWidthScale);
+      this.$emit('scale-change', pageWidthScale);
     },
 
     pageRendered(page) {
@@ -146,11 +152,9 @@ export default {
       return {
         top: $el.scrollTop,
         bottom: $el.scrollTop + $el.clientHeight,
+        height: $el.clientHeight,
+        width: $el.clientWidth,
       };
-    },
-
-    handleScroll() {
-      this.elementBounds = this.getElementBounds();
     },
   },
 

@@ -17,6 +17,9 @@
 </template>
 
 <script>
+import debug from 'debug';
+const log = debug('app:App');
+
 import throttle from 'lodash/throttle'
 import PDFUploader from './components/PDFUploader.vue'
 import PDFViewer from './components/PDFViewer.vue'
@@ -64,6 +67,7 @@ export default {
       this.documentError = e.text;
     },
     scaleChanged(scale) {
+      log('scale changed', scale);
       this.scale = scale;
     },
   },

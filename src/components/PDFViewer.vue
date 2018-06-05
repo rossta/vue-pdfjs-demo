@@ -18,6 +18,7 @@
 
     <PDFDocument
       v-bind="{url, scale, currentPage}"
+      @scale-change="scaleChanged"
       @page-focus="pageFocused"
       @pages-fetched="pagesFetched"
       @document-rendered="documentRendered"
