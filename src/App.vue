@@ -51,15 +51,14 @@ export default {
 body {
   margin: 0;
   padding: 0;
-  background-color: #312b2b;
+  background-color: #606f7b;
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #303030;
-  margin: 1em 0;
+  color: #62637a;
 }
 label.form {
   color: white;
@@ -91,6 +90,10 @@ a.icon {
   width: 1em;
   height: 1em;
   font-size: 1.5em;
+}
+
+.box-shadow {
+  box-shadow: 0 15px 30px 0 rgba(0, 0, 0, 0.11), 0 5px 15px 0 rgba(0, 0, 0, 0.08);
 }
 
 @media print {

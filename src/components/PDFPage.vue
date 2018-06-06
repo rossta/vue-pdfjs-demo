@@ -45,7 +45,7 @@ export default {
         width,
         height,
         style,
-        class: 'pdf-page',
+        class: 'pdf-page box-shadow',
       };
     },
 
@@ -183,6 +183,6 @@ export default {
 <style>
 .pdf-page {
   display: block;
-  margin: 0 auto 0.5em;
+  margin: 0 auto 1em;
 }
 </style>

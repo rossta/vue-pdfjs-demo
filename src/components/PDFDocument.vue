@@ -234,10 +234,11 @@ export default {
   position: absolute;
   overflow: auto;
   width: 100%;
-  top: 80px;
+  top: 70px;
   bottom: 0;
   left: 0;
   right: 0;
+  background: #525f69;
 }
 @media print {
   .pdf-document {

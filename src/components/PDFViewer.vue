@@ -1,6 +1,6 @@
 <template>
   <div class="pdf-viewer">
-    <header>
+    <header class="box-shadow">
       <PDFZoom
         :scale="scale"
         @change="scaleChanged"
@@ -98,10 +98,12 @@ header {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 1em;
+  padding: 1em;
+  position: relative;
+  z-index: 99;
 }
 .header-item {
-  margin: 0.25em 2.5em;
+  margin: 0 2.5em;
 }
 
 @media print {
