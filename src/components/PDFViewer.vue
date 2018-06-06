@@ -16,20 +16,26 @@
       <slot name="header"></slot>
     </header>
 
-    <PDFDocument
-      v-bind="{url, scale, currentPage}"
-      @scale-change="scaleChanged"
-      @page-focus="pageFocused"
+    <PDFDocumentProxy
+      :url="url"
       @pages-fetched="pagesFetched"
       @document-rendered="documentRendered"
       @document-errored="documentErrored"
-      />
+      >
+      <PDFDocument
+        slot-scope="{pages}"
+        v-bind="{pages, scale, currentPage}"
+        @scale-change="scaleChanged"
+        @page-focus="pageFocused"
+        />
+    </PDFDocumentProxy>
   </div>
 </template>
 
 <script>
 import deferredPromise from '../utils/deferredPromise';
 import PDFDocument from './PDFDocument';
+import PDFDocumentProxy from './PDFDocumentProxy';
 import PDFPaginator from './PDFPaginator';
 import PDFZoom from './PDFZoom';
 
@@ -43,6 +49,7 @@ export default {
 
   components: {
     PDFDocument,
+    PDFDocumentProxy,
     PDFZoom,
     PDFPaginator,
   },

@@ -57,7 +57,7 @@ export default {
   methods: {
     focusPage() {
       if (this.isElementFocused()) {
-        this.logBoundaries('page focused');
+        this.logBoundaries('focused');
         this.$emit('page-focus', this.pageNumber);
       }
 
@@ -74,10 +74,12 @@ export default {
       this.renderTask = this.page.render(this.getRenderContext());
       this.renderTask
         .then(() => this.$emit('page-rendered', this.page))
-        .then(() => log(`Page ${this.pageNumber} rendered`))
         .catch(response => {
-          log(`Failed to render page ${this.pageNumber}`, response);
-          this.$emit('page-errored', {text: `Failed to render page ${this.pageNumber}`, response});
+          this.$emit('page-errored', {
+            response,
+            page: this.page,
+            text: `Failed to render page ${this.pageNumber}`,
+          });
         });
     },
 
@@ -126,7 +128,7 @@ export default {
     logBoundaries(label) {
       const {top: containerTop, bottom: containerBottom} = this.containerBounds;
       const {top, bottom} = this.getElementBounds();
-      log(label, {containerTop, containerBottom}, {top, bottom}, this.pageNumber);
+      log(`Page ${this.pageNumber}`, label, {top, bottom}, {containerTop, containerBottom});
     },
 
     cancelRenderTask() {
@@ -152,10 +154,12 @@ export default {
     },
 
     containerBounds() {
+      log('container bounds changed');
       this.focusPage();
     },
 
     scale() {
+      log('scale changed');
       this.focusPage();
     },
   },

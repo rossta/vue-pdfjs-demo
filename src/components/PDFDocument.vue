@@ -7,7 +7,7 @@
       :page="page"
       :isFocusedPage="page.pageNumber === focusedPage"
       :containerBounds="elementBounds"
-      @page-top="handleScrollTop"
+      @page-top="handlePageTop"
       @page-focus="handlePageFocus"
       @page-rendered="pageRendered"
       @page-errored="pageErrored"
@@ -23,36 +23,18 @@
 import debug from 'debug';
 const log = debug('app:components/PDFDocument');
 
-import range from 'lodash/range';
 import throttle from 'lodash/throttle';
 
 import {PIXEL_RATIO} from '../utils/constants';
-import deferredPromise from '../utils/deferredPromise';
 import PDFPage from './PDFPage';
 
 const BUFFER_LENGTH = 4;
-
-function getDocument(url) {
-  // Using import statement in this way allows Webpack
-  // to treat pdf.js as an async dependency so we can
-  // avoid adding it to one of the main bundles
-  return import(
-    /* webpackChunkName: 'pdfjs-dist' */
-    'pdfjs-dist/webpack').then(pdfjs => pdfjs.getDocument(url));
-}
-
-// pdf: instance of PDFDocumentProxy
-// see docs for PDF.js for more info
-function getAllPages(pdf) {
-  const allPages = range(1, pdf.numPages).map(number => pdf.getPage(number));
-  return Promise.all(allPages);
-}
 
 function getScaleFactor() {
   const [LARGE, MIDDLE, SMALL] = [480, 768, 1024];
   const SCALE_FACTORS = {
     [SMALL]: 0.95,
-    [MIDDLE]: 0.75,
+    [MIDDLE]: 0.85,
     [LARGE]: 0.60,
   };
   const clientWidth = document.body.clientWidth;
@@ -70,8 +52,7 @@ export default {
     PDFPage,
   },
   props: {
-    url: {
-      type: String,
+    pages: {
       required: true,
     },
     scale: {
@@ -86,8 +67,6 @@ export default {
 
   data() {
     return {
-      pdf: undefined,
-      pages: [],
       focusedPage: undefined,
       elementBounds: {},
       visiblePages: [],
@@ -96,27 +75,9 @@ export default {
   },
 
   watch: {
-    url: {
-      handler(url) {
-        getDocument(url)
-          .then(pdf => (this.pdf = pdf))
-          .catch(response => {
-            this.$emit('document-errored', {text: 'Failed to retrieve PDF', response});
-            log('Failed to retrieve PDF', response);
-          });
-      },
-      immediate: true,
-    },
-
-    pdf(pdf) {
-      this.pages = [];
-      this.visiblePages = [];
-      getAllPages(pdf)
-        .then(pages => this.updatePages(pages))
-        .catch(response => {
-          this.$emit('document-errored', {text: 'Failed to retrieve pages', response});
-          log('Failed to retrieve pages', response);
-        });
+    pages(pages) {
+      if (pages.length) this.visiblePages = pages.slice(0, BUFFER_LENGTH);
+      this.updateScale();
     },
 
     currentPage(currentPage) {
@@ -130,31 +91,8 @@ export default {
   },
 
   methods: {
-    updatePages(pages) {
-      if (pages.length) this.updateScale(pages[0]);
-
-      const promises = pages.map((page) => {
-        page._renderPromise = deferredPromise();
-        return page._renderPromise;
-      });
-
-      Promise.all(promises)
-        .then(() => this.$emit('document-rendered'))
-        .then(() => log('Rendered all pages'))
-        .catch(response => {
-          this.$emit('document-errored', {text: 'Failed to render pages', response});
-          log('Failed to render pages', response);
-        });
-
-      log('Retrieved all pages');
-      this.pages = pages;
-      this.visiblePages = pages.slice(0, BUFFER_LENGTH);
-      this.$emit('pages-fetched', this.pages);
-    },
-
-    handleScrollTop(scrollTop) {
-      this.$el.scrollTop = scrollTop;
-      this.handleScroll();
+    handlePageTop(scrollTop) {
+      this.$el.scrollTop = scrollTop; // triggers 'scroll' event
     },
 
     handlePageFocus(pageNumber) {
@@ -170,12 +108,12 @@ export default {
     },
 
     handleResize() {
-      if (this.pages.length) {
-        this.updateScale(this.pages[0]);
-      }
+      this.updateScale();
     },
 
-    updateScale(page) {
+    updateScale() {
+      if (!this.pages.length) return;
+      const [page] = this.pages;
       const {width} = this.getElementBounds();
       const defaultViewport = page.getViewport(1.0);
       const pageWidthScale = (width * PIXEL_RATIO) * getScaleFactor() / defaultViewport.width;
@@ -185,11 +123,11 @@ export default {
     },
 
     pageRendered(page) {
-      page._renderPromise.resolve(page);
+      this.$parent.$emit('page-rendered', page);
     },
 
     pageErrored(error) {
-      this.$emit('errored', error);
+      this.$parent.$emit('page-errored', error);
     },
 
     getElementBounds() {
@@ -229,6 +167,7 @@ export default {
   },
 };
 </script>
+
 <style>
 .pdf-document {
   position: absolute;
