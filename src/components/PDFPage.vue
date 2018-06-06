@@ -102,14 +102,15 @@ export default {
       return {
         top: $el.offsetTop,
         bottom: $el.offsetTop + $el.clientHeight,
+        height: $el.clientHeight,
       };
     },
 
     isElementFocused() {
       const {top: containerTop, bottom: containerBottom} = this.containerBounds;
-      const {top, bottom} = this.getElementBounds();
+      const {top, bottom, height} = this.getElementBounds();
       const containerMiddle = containerTop + (containerBottom - containerTop) / 2;
-      return top <= containerMiddle && bottom >= containerMiddle;
+      return top < (containerTop + height) && top <= containerMiddle && bottom >= containerMiddle;
     },
 
     isElementVisible() {
