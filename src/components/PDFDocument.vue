@@ -30,7 +30,7 @@ import {PIXEL_RATIO} from '../utils/constants';
 import deferredPromise from '../utils/deferredPromise';
 import PDFPage from './PDFPage';
 
-const BUFFER_LENGTH = 3;
+const BUFFER_LENGTH = 4;
 
 function getDocument(url) {
   // Using import statement in this way allows Webpack
