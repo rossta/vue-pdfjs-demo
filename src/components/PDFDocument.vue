@@ -103,8 +103,8 @@ export default {
       const elementBounds = this.getElementBounds();
       this.elementBounds = elementBounds;
 
-      const {bottom, height, scrollHeight} = elementBounds;
-      this.isBottomVisible = bottom >= scrollHeight || height > scrollHeight;
+      const {scrollTop, clientHeight, scrollHeight} = this.$el;
+      this.isBottomVisible = (scrollTop + clientHeight) >= scrollHeight || clientHeight >= scrollHeight;
     },
 
     handleResize() {
@@ -114,7 +114,7 @@ export default {
     updateScale() {
       if (!this.pages.length) return;
       const [page] = this.pages;
-      const {width} = this.getElementBounds();
+      const width = this.$el.clientWidth;
       const defaultViewport = page.getViewport(1.0);
       const pageWidthScale = (width * PIXEL_RATIO) * getScaleFactor() / defaultViewport.width;
 
@@ -135,9 +135,6 @@ export default {
       return {
         top: $el.scrollTop,
         bottom: $el.scrollTop + $el.clientHeight,
-        height: $el.clientHeight,
-        width: $el.clientWidth,
-        scrollHeight: $el.scrollHeight,
       };
     },
 
