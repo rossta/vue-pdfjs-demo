@@ -111,8 +111,9 @@ export default {
     isElementFocused() {
       const {top: containerTop, bottom: containerBottom} = this.containerBounds;
       const {top, bottom, height} = this.getElementBounds();
-      const containerMiddle = containerTop + (containerBottom - containerTop) / 2;
-      return top < (containerTop + height) && top <= containerMiddle && bottom >= containerMiddle;
+      const halfHeight = (height / 2);
+
+      return top >= (containerTop - halfHeight) && top < (containerTop + halfHeight);
     },
 
     isElementVisible() {
@@ -154,12 +155,10 @@ export default {
     },
 
     containerBounds() {
-      log('container bounds changed');
       this.focusPage();
     },
 
     scale() {
-      log('scale changed');
       this.focusPage();
     },
   },

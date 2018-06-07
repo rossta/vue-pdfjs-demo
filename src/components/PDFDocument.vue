@@ -95,8 +95,7 @@ export default {
     },
 
     handleScroll() {
-      const elementBounds = this.getElementBounds();
-      this.elementBounds = elementBounds;
+      this.elementBounds = this.getElementBounds();
 
       if (this.isBottomVisible()) this.updateVisiblePages();
     },
