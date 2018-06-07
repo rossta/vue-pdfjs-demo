@@ -70,7 +70,6 @@ export default {
       focusedPage: undefined,
       elementBounds: {},
       visiblePages: [],
-      isBottomVisible: false,
     };
   },
 
@@ -83,10 +82,6 @@ export default {
     currentPage(currentPage) {
       this.updateVisiblePages(currentPage);
       this.$nextTick(() => (this.focusedPage = currentPage));
-    },
-
-    isBottomVisible(isBottomVisible) {
-      if (isBottomVisible) this.updateVisiblePages();
     },
   },
 
@@ -103,8 +98,7 @@ export default {
       const elementBounds = this.getElementBounds();
       this.elementBounds = elementBounds;
 
-      const {scrollTop, clientHeight, scrollHeight} = this.$el;
-      this.isBottomVisible = (scrollTop + clientHeight) >= scrollHeight || clientHeight >= scrollHeight;
+      if (this.isBottomVisible()) this.updateVisiblePages();
     },
 
     handleResize() {
@@ -136,6 +130,11 @@ export default {
         top: $el.scrollTop,
         bottom: $el.scrollTop + $el.clientHeight,
       };
+    },
+
+    isBottomVisible() {
+      const {scrollTop, clientHeight, scrollHeight} = this.$el;
+      return (scrollTop + clientHeight) >= scrollHeight || clientHeight >= scrollHeight;
     },
 
     updateVisiblePages(currentPage) {
