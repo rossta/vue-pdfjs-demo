@@ -26,24 +26,8 @@ const log = debug('app:components/PDFDocument');
 import throttle from 'lodash/throttle';
 
 import {PIXEL_RATIO} from '../utils/constants';
+import responsiveScaleFactor from '../utils/responsiveScaleFactor';
 import PDFPage from './PDFPage';
-
-function getScaleFactor() {
-  const [LARGE, MIDDLE, SMALL] = [480, 768, 1024];
-  const SCALE_FACTORS = {
-    [SMALL]: 0.95,
-    [MIDDLE]: 0.85,
-    [LARGE]: 0.75,
-  };
-  const clientWidth = document.body.clientWidth;
-  if (clientWidth > LARGE) {
-    return SCALE_FACTORS[LARGE];
-  } else if (clientWidth > MIDDLE) {
-    return SCALE_FACTORS[MIDDLE];
-  } else {
-    return SCALE_FACTORS[SMALL];
-  }
-}
 
 export default {
   components: {
@@ -110,12 +94,15 @@ export default {
       this.updateScale();
     },
 
+
+    // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
+    // and a subjective scale factor based on the screen size.
     updateScale() {
       if (!this.pages.length) return;
       const [page] = this.pages;
       const width = this.$el.clientWidth;
       const defaultViewport = page.getViewport(1.0);
-      const pageWidthScale = (width * PIXEL_RATIO) * getScaleFactor() / defaultViewport.width;
+      const pageWidthScale = (width * PIXEL_RATIO) * responsiveScaleFactor() / defaultViewport.width;
 
       log('calculating initial scale', width, defaultViewport.width, pageWidthScale);
       this.$emit('scale-change', pageWidthScale);
@@ -143,6 +130,7 @@ export default {
     },
 
     fetchPages(currentPage) {
+      log('this.pageCount', this.pageCount);
       if (this.pages.length === this.pageCount) return;
 
       this.$parent.$emit('fetch-pages', currentPage);
