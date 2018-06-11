@@ -1,3 +1,11 @@
+const output = {
+  globalObject: "this",
+};
+
+if (process.env.PUBLIC_PATH) {
+  Object.assign(output, {publicPath: process.env.PUBLIC_PATH});
+}
+
 module.exports = {
   configureWebpack: {
     devServer: {
@@ -5,9 +13,7 @@ module.exports = {
         poll: true,
       },
     },
-    output: {
-      globalObject: "this",
-    },
+    output,
   },
   chainWebpack: config => {
     config.module
