@@ -20,10 +20,12 @@ function getDocument(url) {
 
 // pdf: instance of PDFDocumentProxy
 // see docs for PDF.js for more info
-function getAllPages(pdf) {
-  const allPages = range(1, pdf.numPages).map(number => pdf.getPage(number));
+function getPages(pdf, first, last) {
+  const allPages = range(first, last+1).map(number => pdf.getPage(number));
   return Promise.all(allPages);
 }
+
+const BUFFER_LENGTH = 3;
 
 export default {
   props: {
@@ -37,6 +39,7 @@ export default {
     return {
       pdf: undefined,
       pages: [],
+      cursor: 0,
     };
   },
 
@@ -53,53 +56,59 @@ export default {
       immediate: true,
     },
 
-    pdf(pdf) {
-      this.pages = [];
-      getAllPages(pdf)
-        .then(this.updatePages)
+    pdf(pdf, oldPdf) {
+      if (!pdf) return;
+      if (oldPdf) this.pages = [];
+
+      this.$emit('page-count', this.pageCount);
+      this.fetchPages();
+    },
+  },
+
+  computed: {
+    pageCount() {
+      return this.pdf && this.pdf.numPages;
+    },
+  },
+
+  methods: {
+    fetchPages(currentPage = 0) {
+      if (!this.pdf) return;
+      if (this.pages.length === this.pageCount) return;
+
+      const startIndex = this.pages.length;
+      if (this.cursor > startIndex) return;
+
+      const startPage = startIndex + 1;
+      const endPage = Math.min(Math.max(currentPage, startIndex + BUFFER_LENGTH), this.pageCount);
+      this.cursor = endPage;
+
+      log(`Fetching pages ${startPage} to ${endPage}`);
+      getPages(this.pdf, startPage, endPage)
+        .then((pages) => {
+          const deleteCount = 0;
+          this.pages.splice(startIndex, deleteCount, ...pages);
+          return this.pages;
+        })
         .catch(response => {
           this.$emit('document-errored', {text: 'Failed to retrieve pages', response});
           log('Failed to retrieve pages', response);
         });
     },
-  },
-
-  methods: {
-    updatePages(pages) {
-      const promises = pages.map((page) => {
-        page._renderPromise = deferredPromise();
-        return page._renderPromise;
-      });
-
-      Promise.all(promises)
-        .then(() => this.$emit('document-rendered'))
-        .then(() => log('Rendered all pages'))
-        .catch(response => {
-          this.$emit('document-errored', {text: 'Failed to render pages', response});
-          log('Failed to render pages', response);
-        });
-
-      log('Retrieved all pages');
-      this.pages = pages;
-      this.$emit('pages-fetched', this.pages);
-
-      return pages;
-    },
 
     pageRendered(page) {
       log(`Page ${page.pageNumber} rendered`);
-      page._renderPromise.resolve(page);
     },
 
     pageErrored({text, response, page}) {
-      log(text, response);
-      page._renderPromise.reject(response);
+      log(text, response, page);
     },
   },
 
   created() {
     this.$on('page-rendered', this.pageRendered);
     this.$on('page-errored', this.pageErrored);
+    this.$on('fetch-pages', this.fetchPages);
   },
 
   render() {

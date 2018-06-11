@@ -1,7 +1,7 @@
 <template>
   <div class="pdf-document">
     <PDFPage
-      v-for="page in visiblePages"
+      v-for="page in pages"
       v-bind="{scale}"
       :key="page.pageNumber"
       :page="page"
@@ -35,7 +35,7 @@ function getScaleFactor() {
   const SCALE_FACTORS = {
     [SMALL]: 0.95,
     [MIDDLE]: 0.85,
-    [LARGE]: 0.60,
+    [LARGE]: 0.75,
   };
   const clientWidth = document.body.clientWidth;
   if (clientWidth > LARGE) {
@@ -55,6 +55,10 @@ export default {
     pages: {
       required: true,
     },
+    pageCount: {
+      type: Number,
+      default: 0,
+    },
     scale: {
       type: Number,
       default: 1.0,
@@ -69,19 +73,23 @@ export default {
     return {
       focusedPage: undefined,
       elementBounds: {},
-      visiblePages: [],
     };
   },
 
   watch: {
-    pages(pages) {
-      if (pages.length) this.visiblePages = pages.slice(0, BUFFER_LENGTH);
+    pages() {
       this.updateScale();
+      this.$nextTick(() => {
+        this.focusedPage = this.currentPage;
+      });
     },
 
     currentPage(currentPage) {
-      this.updateVisiblePages(currentPage);
-      this.$nextTick(() => (this.focusedPage = currentPage));
+      if (currentPage >= this.pages.length) {
+        this.fetchPages(currentPage);
+      } else {
+        this.focusedPage = currentPage;
+      }
     },
   },
 
@@ -97,7 +105,7 @@ export default {
     handleScroll() {
       this.elementBounds = this.getElementBounds();
 
-      if (this.isBottomVisible()) this.updateVisiblePages();
+      if (this.isBottomVisible()) this.fetchPages();
     },
 
     handleResize() {
@@ -136,24 +144,20 @@ export default {
       return (scrollTop + clientHeight) >= scrollHeight || clientHeight >= scrollHeight;
     },
 
-    updateVisiblePages(currentPage) {
-      const visibleCount = this.visiblePages.length;
-      const totalPages = currentPage || this.pages.length;
+    fetchPages(currentPage) {
+      if (this.pages.length === this.pageCount) return;
 
-      if (visibleCount < totalPages) {
-        const buffer = currentPage ? currentPage - visibleCount : BUFFER_LENGTH;
-        this.visiblePages.splice(visibleCount, 0, ...this.pages.slice(visibleCount, visibleCount+buffer));
-      }
+      this.$parent.$emit('fetch-pages', currentPage);
     },
   },
 
   mounted() {
     this.handleScroll();
-    this.throttledScroll = throttle(this.handleScroll, 500);
+    this.throttledScroll = throttle(this.handleScroll, 300);
     window.addEventListener('scroll', this.throttledScroll, true);
 
-    this.throttledResize = throttle(this.handleResize, 500)
-    window.addEventListener('resize', this.handleResize, true)
+    this.throttledResize = throttle(this.handleResize, 300);
+    window.addEventListener('resize', this.handleResize, true);
   },
 
   beforeDestroy() {

@@ -18,12 +18,12 @@
 
     <PDFDocumentProxy
       :url="url"
-      @pages-fetched="pagesFetched"
+      @page-count="updatePageCount"
       @document-rendered="documentRendered"
       @document-errored="documentErrored"
       >
       <PDFDocument
-        slot-scope="{pages}"
+        slot-scope="{pages, pageCount}"
         v-bind="{pages, scale, currentPage}"
         @scale-change="scaleChanged"
         @page-focus="pageFocused"
@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import deferredPromise from '../utils/deferredPromise';
 import PDFDocument from './PDFDocument';
 import PDFDocumentProxy from './PDFDocumentProxy';
 import PDFPaginator from './PDFPaginator';
@@ -65,7 +64,6 @@ export default {
       pageCount: undefined,
       rendered: false,
       force: false,
-      renderPromise: deferredPromise(),
     };
   },
 
@@ -82,18 +80,12 @@ export default {
       this.scale = round(scale, 1);
     },
 
-    pagesFetched(pages) {
-      this.pageCount = pages.length;
+    updatePageCount(pageCount) {
+      this.pageCount = pageCount;
     },
 
     pageFocused(pageNumber) {
       this.currentPage = pageNumber;
-    },
-  },
-
-  watch: {
-    url() {
-      this.renderPromise = deferredPromise();
     },
   },
 };
