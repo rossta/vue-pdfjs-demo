@@ -109,8 +109,8 @@ export default {
     },
 
     isElementFocused() {
-      const {top: containerTop, bottom: containerBottom} = this.containerBounds;
-      const {top, bottom, height} = this.getElementBounds();
+      const {top: containerTop} = this.containerBounds;
+      const {top, height} = this.getElementBounds();
       const halfHeight = (height / 2);
 
       return top >= (containerTop - halfHeight) && top < (containerTop + halfHeight);

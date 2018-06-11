@@ -28,8 +28,6 @@ import throttle from 'lodash/throttle';
 import {PIXEL_RATIO} from '../utils/constants';
 import PDFPage from './PDFPage';
 
-const BUFFER_LENGTH = 4;
-
 function getScaleFactor() {
   const [LARGE, MIDDLE, SMALL] = [480, 768, 1024];
   const SCALE_FACTORS = {

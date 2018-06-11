@@ -7,7 +7,6 @@ import debug from 'debug';
 const log = debug('app:components/PDFDocumentProxy');
 
 import range from 'lodash/range';
-import deferredPromise from '../utils/deferredPromise';
 
 function getDocument(url) {
   // Using import statement in this way allows Webpack
