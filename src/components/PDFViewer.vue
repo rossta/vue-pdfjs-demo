@@ -62,8 +62,6 @@ export default {
       scale: undefined,
       currentPage: undefined,
       pageCount: undefined,
-      rendered: false,
-      force: false,
     };
   },
 
@@ -75,7 +73,7 @@ export default {
 
   methods: {
     documentRendered() {
-      this.renderPromise.resolve();
+      this.$emit('document-errored', this.url);
     },
 
     documentErrored(e) {

@@ -39,6 +39,7 @@ export default {
 
   methods: {
     urlUpdated(url) {
+      this.documentError = undefined;
       this.url = url;
     },
     documentErrored(e) {
