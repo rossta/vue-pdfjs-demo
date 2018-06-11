@@ -23,8 +23,8 @@
       @document-errored="documentErrored"
       >
       <PDFDocument
-        slot-scope="{pages, pageCount}"
-        v-bind="{pages, scale, currentPage}"
+        slot-scope="{pages}"
+        v-bind="{pages, scale, currentPage, pageCount}"
         @scale-change="scaleChanged"
         @page-focus="pageFocused"
         />
@@ -65,6 +65,12 @@ export default {
       rendered: false,
       force: false,
     };
+  },
+
+  watch: {
+    url() {
+      this.currentPage = undefined;
+    },
   },
 
   methods: {

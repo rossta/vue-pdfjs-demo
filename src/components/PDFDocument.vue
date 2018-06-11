@@ -5,8 +5,8 @@
       v-bind="{scale}"
       :key="page.pageNumber"
       :page="page"
-      :isFocusedPage="page.pageNumber === focusedPage"
-      :containerBounds="elementBounds"
+      :is-focused-page="page.pageNumber === focusedPage"
+      :scroll-bounds="elementBounds"
       @page-top="handlePageTop"
       @page-focus="handlePageFocus"
       @page-rendered="pageRendered"
@@ -60,7 +60,7 @@ export default {
 
   watch: {
     pages() {
-      this.updateScale();
+      if (!this.focusedPage) this.updateScale();
       this.$nextTick(() => {
         this.focusedPage = this.currentPage;
       });
@@ -72,6 +72,10 @@ export default {
       } else {
         this.focusedPage = currentPage;
       }
+    },
+
+    pageCount() {
+      this.updateScale();
     },
   },
 
@@ -85,7 +89,7 @@ export default {
     },
 
     handleScroll() {
-      this.elementBounds = this.getElementBounds();
+      this.elementBounds = this.getScrollBounds();
 
       if (this.isBottomVisible()) this.fetchPages();
     },
@@ -93,7 +97,6 @@ export default {
     handleResize() {
       this.updateScale();
     },
-
 
     // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
     // and a subjective scale factor based on the screen size.
@@ -116,22 +119,22 @@ export default {
       this.$parent.$emit('page-errored', error);
     },
 
-    getElementBounds() {
-      const $el = this.$el;
+    getScrollBounds() {
+      const {scrollTop, clientHeight} = this.$el;
       return {
-        top: $el.scrollTop,
-        bottom: $el.scrollTop + $el.clientHeight,
+        top: scrollTop,
+        bottom: scrollTop + clientHeight,
+        height: clientHeight,
       };
     },
 
     isBottomVisible() {
       const {scrollTop, clientHeight, scrollHeight} = this.$el;
-      return (scrollTop + clientHeight) >= scrollHeight || clientHeight >= scrollHeight;
+      return (scrollTop + clientHeight) >= scrollHeight;
     },
 
     fetchPages(currentPage) {
-      log('this.pageCount', this.pageCount);
-      if (this.pages.length === this.pageCount) return;
+      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
 
       this.$parent.$emit('fetch-pages', currentPage);
     },

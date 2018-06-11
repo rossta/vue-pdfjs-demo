@@ -14,7 +14,7 @@ export default {
       type: Number,
       required: true,
     },
-    containerBounds: {
+    scrollBounds: {
       type: Object,
       default: () => ({}),
     },
@@ -100,36 +100,37 @@ export default {
     },
 
     getElementBounds() {
-      const $el = this.$el;
+      const {offsetTop, clientHeight} = this.$el;
       return {
-        top: $el.offsetTop,
-        bottom: $el.offsetTop + $el.clientHeight,
-        height: $el.clientHeight,
+        top: offsetTop,
+        bottom: offsetTop + clientHeight,
+        height: clientHeight,
       };
     },
 
     isElementFocused() {
-      const {top: containerTop} = this.containerBounds;
-      const {top, height} = this.getElementBounds();
-      const halfHeight = (height / 2);
+      const {top: scrollTop, height: visibleHeight} = this.scrollBounds;
+      const {top, bottom} = this.getElementBounds();
+      const halfHeight = (visibleHeight / 2);
 
-      return top >= (containerTop - halfHeight) && top < (containerTop + halfHeight);
+      return (top - halfHeight) <= scrollTop && scrollTop < (bottom - halfHeight);
     },
 
     isElementVisible() {
-      const {top: containerTop, bottom: containerBottom} = this.containerBounds;
-      const {top, bottom} = this.getElementBounds();
+      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
+      const {top, height} = this.getElementBounds();
+      const bottom = top + height;
 
       return !(
-        (bottom < containerTop && top < containerTop) ||
-        (top > containerBottom && bottom > containerBottom)
+        (bottom < scrollTop && top < scrollTop) ||
+        (top > scrollBottom && bottom > scrollBottom)
       );
     },
 
     logBoundaries(label) {
-      const {top: containerTop, bottom: containerBottom} = this.containerBounds;
+      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
       const {top, bottom} = this.getElementBounds();
-      log(`Page ${this.pageNumber}`, label, {top, bottom}, {containerTop, containerBottom});
+      log(`Page ${this.pageNumber}`, label, {top, bottom}, {scrollTop, scrollBottom});
     },
 
     cancelRenderTask() {
@@ -154,7 +155,7 @@ export default {
       }
     },
 
-    containerBounds() {
+    scrollBounds() {
       this.focusPage();
     },
 

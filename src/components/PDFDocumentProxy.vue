@@ -25,6 +25,12 @@ function getPages(pdf, first, last) {
 }
 
 const BUFFER_LENGTH = 3;
+function getDefaults() {
+  return {
+    pages: [],
+    cursor: 0,
+  };
+}
 
 export default {
   props: {
@@ -35,11 +41,9 @@ export default {
   },
 
   data() {
-    return {
+    return Object.assign(getDefaults(), {
       pdf: undefined,
-      pages: [],
-      cursor: 0,
-    };
+    });
   },
 
   watch: {
@@ -57,7 +61,7 @@ export default {
 
     pdf(pdf, oldPdf) {
       if (!pdf) return;
-      if (oldPdf) this.pages = [];
+      if (oldPdf) Object.assign(this, getDefaults());
 
       this.$emit('page-count', this.pageCount);
       this.fetchPages();
