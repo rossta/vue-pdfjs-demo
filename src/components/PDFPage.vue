@@ -56,7 +56,7 @@ export default {
 
   methods: {
     focusPage() {
-      if (this.isElementFocused()) {
+      if (this.isElementFocused() && !this.isFocusedPage) {
         this.logBoundaries('focused');
         this.$emit('page-focus', this.pageNumber);
       }
@@ -128,9 +128,12 @@ export default {
     },
 
     logBoundaries(label) {
-      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
-      const {top, bottom} = this.getElementBounds();
-      log(`Page ${this.pageNumber}`, label, {top, bottom}, {scrollTop, scrollBottom});
+      const {top: scrollTop, bottom: scrollBottom, height: clientHeight} = this.scrollBounds;
+      log(
+        `Page ${this.pageNumber}`, label,
+        this.getElementBounds(),
+        {scrollTop, scrollBottom, clientHeight},
+      );
     },
 
     cancelRenderTask() {
