@@ -7,6 +7,8 @@ jobs:
     parallelism: 1
     environment:
       WEBPACK_PUBLIC_PATH: "/vue-pdfjs-demo/"
+    branches:
+      ignore: gh-pages
     working_directory: ~/rossta/vue-pdfjs-demo
     steps:
       - checkout
