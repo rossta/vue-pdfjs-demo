@@ -1,0 +1,51 @@
+# This configuration was automatically generated from a CircleCI 1.0 config.
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.11.2
+    parallelism: 1
+    environment:
+      WEBPACK_PUBLIC_PATH: "/vue-pdfjs-demo/"
+    working_directory: ~/rossta/vue-pdfjs-demo
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/rossta/vue-pdfjs-demo
+      - restore_cache:
+          key: v1-yarn-{{ checksum "yarn.lock" }}
+      - run: yarn install
+      - save_cache:
+          key: v1-yarn-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
+      - run: yarn build
+      - persist_to_workspace:
+          root: .
+          paths: dist
+
+  deploy:
+    docker:
+      - image: circleci/node:8.11.2
+    parallelism: 1
+    working_directory: ~/rossta/vue-pdfjs-demo
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/rossta/vue-pdfjs-demo
+      - run: ./.circleci/deploy.sh
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: gh-pages
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
