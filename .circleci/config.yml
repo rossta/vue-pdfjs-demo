@@ -33,7 +33,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/rossta/vue-pdfjs-demo
-      - run: ./deploy.sh
+      - run: ./.circleci/deploy.sh
 
 workflows:
   version: 2
