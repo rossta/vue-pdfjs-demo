@@ -22,29 +22,16 @@ jobs:
           root: .
           paths: dist
 
-    deploy:
-      docker:
-        - image: circleci/node:8.11.2
-      parallelism: 1
-      working_directory: ~/rossta/vue-pdfjs-demo
-      steps:
-        - checkout
-        - attach_workspace:
-            at: ~/rossta/vue-pdfjs-demo
-        - run: |
-            CWD=`pwd`
-            BRANCH=gh-pages
-            cd /tmp
-            git clone $CIRCLE_REPOSITORY_URL dist
-            cd dist && git checkout -b $BRANCH origin/$BRANCH
-            cp -r $CWD/dist/* /tmp/dist
-            cd /tmp/dist
-            git config --global user.email "ross@rossta.net"
-            git config --global user.name "Ross Kaffenberger"
-            git add .
-            $HEAD = `git log --pretty="%h" -n1`
-            git commit -m "Site updated to $HEAD"
-            git push -f origin $BRANCH
+  deploy:
+    docker:
+      - image: circleci/node:8.11.2
+    parallelism: 1
+    working_directory: ~/rossta/vue-pdfjs-demo
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/rossta/vue-pdfjs-demo
+      - run: ./deploy.sh
 
 workflows:
   version: 2
