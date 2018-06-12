@@ -2,8 +2,9 @@ const output = {
   globalObject: "this",
 };
 
-if (process.env.PUBLIC_PATH) {
-  Object.assign(output, {publicPath: process.env.PUBLIC_PATH});
+const publicPath = process.env.WEBPACK_PUBLIC_PATH;
+if (publicPath) {
+  Object.assign(output, {publicPath});
 }
 
 module.exports = {

@@ -5,6 +5,8 @@ jobs:
     docker:
       - image: circleci/node:8.11.2
     parallelism: 1
+    environment:
+      WEBPACK_PUBLIC_PATH: "/vue-pdfjs-demo/"
     working_directory: ~/rossta/vue-pdfjs-demo
     steps:
       - checkout
