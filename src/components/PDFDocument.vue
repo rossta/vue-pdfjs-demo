@@ -2,6 +2,7 @@
   <div
     class="pdf-document"
     v-bottom="fetchPages"
+    v-scroll.immediate="handleScroll"
     >
     <PDFPage
       v-for="page in pages"
@@ -30,6 +31,7 @@ import throttle from 'lodash/throttle';
 import {PIXEL_RATIO} from '../utils/constants';
 import responsiveScaleFactor from '../utils/responsiveScaleFactor';
 import bottom from '../directives/bottom';
+import scroll from '../directives/scroll';
 import PDFPage from './PDFPage';
 
 export default {
@@ -39,7 +41,9 @@ export default {
 
   directives: {
     bottom,
+    scroll,
   },
+
   props: {
     pages: {
       required: true,
@@ -141,16 +145,11 @@ export default {
   },
 
   mounted() {
-    this.handleScroll();
-    this.throttledScroll = throttle(this.handleScroll, 300);
-    window.addEventListener('scroll', this.throttledScroll, true);
-
     this.throttledResize = throttle(this.handleResize, 300);
     window.addEventListener('resize', this.handleResize, true);
   },
 
   beforeDestroy() {
-    if (this.throttledScroll) window.removeEventListener('scroll', this.throttledScroll, true);
     if (this.throttledResize) window.removeEventListener('resize', this.throttledResize, true);
   },
 };
