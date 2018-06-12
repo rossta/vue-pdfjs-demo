@@ -57,7 +57,6 @@ export default {
   methods: {
     focusPage() {
       if (this.isElementFocused() && !this.isFocusedPage) {
-        this.logBoundaries('focused');
         this.$emit('page-focus', this.pageNumber);
       }
 
@@ -67,7 +66,7 @@ export default {
     },
 
     drawPage() {
-      this.cancelRenderTask();
+      if (this.renderTask) return;
 
       // PDFPageProxy#render
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
@@ -89,7 +88,12 @@ export default {
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       page._destroy();
 
-      this.cancelRenderTask();
+      if (!this.renderTask) return;
+
+      // RenderTask#cancel
+      // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
+      this.renderTask.cancel();
+      delete this.renderTask;
     },
 
     getRenderContext() {
@@ -125,24 +129,6 @@ export default {
         (bottom < scrollTop && top < scrollTop) ||
         (top > scrollBottom && bottom > scrollBottom)
       );
-    },
-
-    logBoundaries(label) {
-      const {top: scrollTop, bottom: scrollBottom, height: clientHeight} = this.scrollBounds;
-      log(
-        `Page ${this.pageNumber}`, label,
-        this.getElementBounds(),
-        {scrollTop, scrollBottom, clientHeight},
-      );
-    },
-
-    cancelRenderTask() {
-      if (!this.renderTask) return;
-
-      // RenderTask#cancel
-      // https://mozilla.github.io/pdf.js/api/draft/RenderTask.html
-      this.renderTask.cancel();
-      delete this.renderTask;
     },
   },
 
