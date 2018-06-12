@@ -7,6 +7,8 @@ git clone $CIRCLE_REPOSITORY_URL dist
 
 cd dist && git checkout -b $BRANCH origin/$BRANCH
 
+git rm -rf .
+
 cp -r $CWD/dist/* /tmp/dist
 
 cd /tmp/dist
