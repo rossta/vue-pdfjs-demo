@@ -24,7 +24,7 @@ function getPages(pdf, first, last) {
   return Promise.all(allPages);
 }
 
-const BUFFER_LENGTH = 3;
+const BUFFER_LENGTH = 5;
 function getDefaults() {
   return {
     pages: [],
