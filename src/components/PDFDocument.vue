@@ -1,5 +1,8 @@
 <template>
-  <div class="pdf-document">
+  <div
+    class="pdf-document"
+    v-bottom="fetchPages"
+    >
     <PDFPage
       v-for="page in pages"
       v-bind="{scale}"
@@ -27,11 +30,16 @@ import throttle from 'lodash/throttle';
 
 import {PIXEL_RATIO} from '../utils/constants';
 import responsiveScaleFactor from '../utils/responsiveScaleFactor';
+import bottom from '../directives/bottom';
 import PDFPage from './PDFPage';
 
 export default {
   components: {
     PDFPage,
+  },
+
+  directives: {
+    bottom,
   },
   props: {
     pages: {
