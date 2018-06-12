@@ -5,11 +5,10 @@
     >
     <PDFPage
       v-for="page in pages"
-      v-bind="{scale}"
+      v-bind="{scale, scrollBounds}"
       :key="page.pageNumber"
       :page="page"
       :is-focused-page="page.pageNumber === focusedPage"
-      :scroll-bounds="elementBounds"
       @page-top="handlePageTop"
       @page-focus="handlePageFocus"
       @page-rendered="pageRendered"
@@ -62,7 +61,7 @@ export default {
   data() {
     return {
       focusedPage: undefined,
-      elementBounds: {},
+      scrollBounds: {},
     };
   },
 
@@ -97,9 +96,7 @@ export default {
     },
 
     handleScroll() {
-      this.elementBounds = this.getScrollBounds();
-
-      if (this.isBottomVisible()) this.fetchPages();
+      this.scrollBounds = this.getScrollBounds();
     },
 
     handleResize() {
@@ -134,11 +131,6 @@ export default {
         bottom: scrollTop + clientHeight,
         height: clientHeight,
       };
-    },
-
-    isBottomVisible() {
-      const {scrollTop, clientHeight, scrollHeight} = this.$el;
-      return (scrollTop + clientHeight) >= scrollHeight;
     },
 
     fetchPages(currentPage) {
