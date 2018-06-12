@@ -10,11 +10,12 @@ cd dist && git checkout -b $BRANCH origin/$BRANCH
 git rm -rf .
 
 cp -r $CWD/dist/* /tmp/dist
+cp -r $CWD/.circleci /tmp/dist
 
 cd /tmp/dist
 
-git config --global user.email "ross@rossta.net"
-git config --global user.name "Ross Kaffenberger"
+git config --global user.email "circleci@circleci.com"
+git config --global user.name "CircleCI"
 
 git add .
 
