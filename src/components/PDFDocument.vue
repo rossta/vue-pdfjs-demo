@@ -2,12 +2,12 @@
   <div
     class="pdf-document"
     v-bottom="fetchPages"
-    v-scroll.immediate="handleScroll"
-    v-resize="handleResize"
+    v-scroll.immediate="updateScrollBounds"
+    v-resize="updateScale"
     >
     <PDFPage
       v-for="page in pages"
-      v-bind="{scale, scrollBounds}"
+      v-bind="{scale, scrollBounds, page}"
       :key="page.pageNumber"
       :page="page"
       :is-focused-page="page.pageNumber === focusedPage"
@@ -29,6 +29,7 @@ const log = debug('app:components/PDFDocument');
 
 import {PIXEL_RATIO} from '../utils/constants';
 import responsiveScaleFactor from '../utils/responsiveScaleFactor';
+
 import bottom from '../directives/bottom';
 import scroll from '../directives/scroll';
 import resize from '../directives/resize';
@@ -101,12 +102,8 @@ export default {
       this.$emit('page-focus', pageNumber);
     },
 
-    handleScroll() {
+    updateScrollBounds() {
       this.scrollBounds = this.getScrollBounds();
-    },
-
-    handleResize() {
-      this.updateScale();
     },
 
     // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
