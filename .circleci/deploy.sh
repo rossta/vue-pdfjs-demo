@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 CWD=`pwd`
 BRANCH=gh-pages
 
@@ -19,7 +21,6 @@ git config --global user.name "CircleCI"
 
 git add .
 
-$HEAD = `git log --pretty="%h" -n1`
-git commit -m "Site updated to $HEAD"
+git commit -m "Site updated to $(git log --pretty="%h" -n1)"
 
 git push -f origin $BRANCH
