@@ -64,14 +64,11 @@ export default {
       const {top, height} = this.elementBounds;
       const bottom = top + height;
 
-      const isVisible = this.scale &&
-        height > 0 &&
+      return height > 0 &&
         !(
           (bottom < scrollTop && top < scrollTop) ||
           (top > scrollBottom && bottom > scrollBottom)
         );
-
-      return isVisible;
     },
 
     isElementFocused() {
@@ -79,8 +76,7 @@ export default {
       const {top, bottom, height} = this.elementBounds;
       const halfHeight = (visibleHeight / 2);
 
-      return this.scale &&
-        height > 0 &&
+      return height > 0 &&
         (top - halfHeight) <= scrollTop &&
         scrollTop < (bottom - halfHeight);
     },
@@ -164,6 +160,10 @@ export default {
 
     isElementVisible(isElementVisible) {
       if (isElementVisible) this.drawPage();
+    },
+
+    scale() {
+      this.elementBounds = this.getElementBounds();
     },
   },
 
