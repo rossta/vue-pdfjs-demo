@@ -18,10 +18,16 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    isFocusedPage: {
+    isPageFocused: {
       type: Boolean,
       default: false,
     },
+  },
+
+  data() {
+    return {
+      elementBounds: {},
+    };
   },
 
   computed: {
@@ -52,17 +58,47 @@ export default {
     pageNumber() {
       return this.page.pageNumber;
     },
+
+    isElementVisible() {
+      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
+      const {top, height} = this.elementBounds;
+      const bottom = top + height;
+
+      const isVisible = this.scale &&
+        height > 0 &&
+        !(
+          (bottom < scrollTop && top < scrollTop) ||
+          (top > scrollBottom && bottom > scrollBottom)
+        );
+
+      return isVisible;
+    },
+
+    isElementFocused() {
+      const {top: scrollTop, height: visibleHeight} = this.scrollBounds;
+      const {top, bottom, height} = this.elementBounds;
+      const halfHeight = (visibleHeight / 2);
+
+      return this.scale &&
+        height > 0 &&
+        (top - halfHeight) <= scrollTop &&
+        scrollTop < (bottom - halfHeight);
+    },
   },
 
   methods: {
-    focusPage() {
-      if (this.isElementFocused() && !this.isFocusedPage) {
-        this.$emit('page-focus', this.pageNumber);
-      }
+    focusElement() {
+      if (this.isPageFocused) return;
+      if (this.isElementFocused) return;
 
-      if (this.isElementVisible() && !this.renderTask) {
-        this.drawPage();
-      }
+      const {top} = this.getElementBounds();
+      this.$emit('page-top', top);
+    },
+
+    focusPage() {
+      if (this.isPageFocused) return;
+
+      this.$emit('page-focus', this.pageNumber);
     },
 
     drawPage() {
@@ -111,25 +147,6 @@ export default {
         height: clientHeight,
       };
     },
-
-    isElementFocused() {
-      const {top: scrollTop, height: visibleHeight} = this.scrollBounds;
-      const {top, bottom} = this.getElementBounds();
-      const halfHeight = (visibleHeight / 2);
-
-      return (top - halfHeight) <= scrollTop && scrollTop < (bottom - halfHeight);
-    },
-
-    isElementVisible() {
-      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
-      const {top, height} = this.getElementBounds();
-      const bottom = top + height;
-
-      return !(
-        (bottom < scrollTop && top < scrollTop) ||
-        (top > scrollBottom && bottom > scrollBottom)
-      );
-    },
   },
 
   watch: {
@@ -137,19 +154,16 @@ export default {
       this.destroyPage(oldPage);
     },
 
-    isFocusedPage(isFocusedPage) {
-      if (isFocusedPage && !this.isElementFocused()) {
-        const {top} = this.getElementBounds();
-        this.$emit('page-top', top);
-      }
+    isPageFocused(isPageFocused) {
+      if (isPageFocused) this.focusElement();
     },
 
-    scrollBounds() {
-      this.focusPage();
+    isElementFocused(isElementFocused) {
+      if (isElementFocused) this.focusPage();
     },
 
-    scale() {
-      this.focusPage();
+    isElementVisible(isElementVisible) {
+      if (isElementVisible) this.drawPage();
     },
   },
 
@@ -161,7 +175,9 @@ export default {
 
   mounted() {
     log(`Page ${this.pageNumber} mounted`);
-    this.focusPage();
+    this.elementBounds = this.getElementBounds();
+    if (this.isElementVisible) this.drawPage();
+    if (this.isElementFocused) this.focusPage();
   },
 
   beforeDestroy() {
