@@ -86,7 +86,7 @@ export default {
     focusElement() {
       if (this.isElementFocused) return;
 
-      const {top} = this.getElementBounds();
+      const {top} = this.elementBounds;
       this.$emit('page-top', top);
     },
 
@@ -114,10 +114,9 @@ export default {
     },
 
     destroyPage(page) {
-      if (!page) return;
       // PDFPageProxy#_destroy
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-      page._destroy();
+      if (page) page._destroy();
 
       if (!this.renderTask) return;
 
