@@ -84,7 +84,6 @@ export default {
 
   methods: {
     focusElement() {
-      if (this.isPageFocused) return;
       if (this.isElementFocused) return;
 
       const {top} = this.getElementBounds();
