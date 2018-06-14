@@ -130,7 +130,7 @@ export default {
     },
 
     currentPage(currentPage) {
-      if (currentPage >= this.pages.length) {
+      if (currentPage > this.pages.length) {
         this.fetchPages(currentPage);
       } else {
         this.focusedPage = currentPage;
