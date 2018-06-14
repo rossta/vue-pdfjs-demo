@@ -186,7 +186,7 @@ export default {
 
   mounted() {
     log(`Page ${this.pageNumber} mounted`);
-    this.elementBounds = this.getElementBounds();
+    this.updateElementBounds();
     if (this.isElementVisible) this.drawPage();
     if (this.isElementFocused) this.focusPage();
   },
