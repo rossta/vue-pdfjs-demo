@@ -65,10 +65,8 @@ export default {
       const bottom = top + height;
 
       return height > 0 &&
-        !(
-          (bottom < scrollTop && top < scrollTop) ||
-          (top > scrollBottom && bottom > scrollBottom)
-        );
+        bottom > scrollTop &&
+        top < scrollBottom;
     },
 
     isElementFocused() {
@@ -107,14 +105,24 @@ export default {
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       this.renderTask = this.page.render(renderContext);
       this.renderTask
-        .then(() => this.$emit('page-rendered', this.page))
+        .then(() => {
+          this.$emit('page-rendered', {
+            page: this.page,
+            text: `Rendered page ${this.pageNumber}`,
+          });
+         })
         .catch(response => {
+          this.destroyRenderTask();
           this.$emit('page-errored', {
             response,
             page: this.page,
             text: `Failed to render page ${this.pageNumber}`,
           });
         });
+    },
+
+    updateElementBounds() {
+      this.elementBounds = this.getElementBounds();
     },
 
     getElementBounds() {
@@ -131,6 +139,10 @@ export default {
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       if (page) page._destroy();
 
+      this.destroyRenderTask();
+    },
+
+    destroyRenderTask() {
       if (!this.renderTask) return;
 
       // RenderTask#cancel
@@ -162,9 +174,8 @@ export default {
       if (isElementVisible) this.drawPage();
     },
 
-    scale() {
-      this.elementBounds = this.getElementBounds();
-    },
+    scale: 'updateElementBounds',
+    scrollBounds: 'updateElementBounds',
   },
 
   created() {

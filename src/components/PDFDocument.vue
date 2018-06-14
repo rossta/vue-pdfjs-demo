@@ -93,16 +93,22 @@ export default {
       this.$emit('scale-change', pageWidthScale);
     },
 
-    pageRendered(page) {
-      this.$parent.$emit('page-rendered', page);
-    },
-
-    pageErrored(error) {
-      this.$parent.$emit('page-errored', error);
-    },
-
     updateScrollBounds() {
       this.scrollBounds = this.getScrollBounds();
+    },
+
+    fetchPages(currentPage) {
+      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
+
+      this.$parent.$emit('fetch-pages', currentPage);
+    },
+
+    pageRendered(payload) {
+      this.$parent.$emit('page-rendered', payload);
+    },
+
+    pageErrored(payload) {
+      this.$parent.$emit('page-errored', payload);
     },
 
     getScrollBounds() {
@@ -112,12 +118,6 @@ export default {
         bottom: scrollTop + clientHeight,
         height: clientHeight,
       };
-    },
-
-    fetchPages(currentPage) {
-      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
-
-      this.$parent.$emit('fetch-pages', currentPage);
     },
   },
 

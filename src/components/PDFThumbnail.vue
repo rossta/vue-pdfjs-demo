@@ -23,7 +23,7 @@ import debug from 'debug';
 const log = debug('app:components/PDFThumbnail');
 
 export default {
-  props: ['page', 'scrollBounds', 'isPageFocused'],
+  props: ['page', 'scale', 'scrollBounds', 'isPageFocused'],
 
   data() {
     return {
@@ -47,16 +47,19 @@ export default {
       const bottom = top + height;
 
       return height > 0 &&
-        !(
-          (bottom < scrollTop && top < scrollTop) ||
-          (top > scrollBottom && bottom > scrollBottom)
-        );
+        bottom > scrollTop &&
+        top < scrollBottom;
+
     },
   },
 
   methods: {
     focusPage() {
       this.$emit('page-focus', this.pageNumber);
+    },
+
+    updateElementBounds() {
+      this.elementBounds = this.getElementBounds();
     },
 
     getElementBounds() {
@@ -79,14 +82,29 @@ export default {
       canvas.width = viewport.width;
 
       this.renderTask = this.page.render(renderContext);
-      this.renderTask.then(() => {
-        this.src = canvas.toDataURL();
+      this.renderTask
+        .then(() => {
+          this.src = canvas.toDataURL();
 
-        // Zeroing the width and height causes Firefox to release graphics
-        // resources immediately, which can greatly reduce memory consumption.
-        canvas.width = 0;
-        canvas.height = 0;
-      });
+          // Zeroing the width and height causes Firefox to release graphics
+          // resources immediately, which can greatly reduce memory consumption.
+          canvas.width = 0;
+          canvas.height = 0;
+        })
+        .then(() => {
+          this.$emit('page-rendered', {
+            page: this.page,
+            text: `Rendered thumbnail ${this.pageNumber}`,
+          });
+         })
+        .catch(response => {
+          this.destroyRenderTask();
+          this.$emit('page-errored', {
+            response,
+            page: this.page,
+            text: `Failed to render thumbnail ${this.pageNumber}`,
+          });
+        });
     },
 
     destroyPage(_newPage, page) {
@@ -94,6 +112,10 @@ export default {
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       if (page) page._destroy();
 
+      this.destroyRenderTask();
+    },
+
+    destroyRenderTask() {
       if (!this.renderTask) return;
 
       // RenderTask#cancel
@@ -101,17 +123,17 @@ export default {
       this.renderTask.cancel();
       delete this.renderTask;
     },
-
-    getRenderContext() {
-
-    },
   },
+
   watch: {
     page: 'destroyPage',
 
     isElementVisible(isElementVisible) {
       if (isElementVisible) this.drawPage();
     },
+
+    scale: 'updateElementBounds',
+    scrollBounds: 'updateElementBounds',
   },
 
   mounted() {

@@ -99,12 +99,12 @@ export default {
         });
     },
 
-    pageRendered(page) {
-      log(`Page ${page.pageNumber} rendered`);
+    pageRendered({text, page}) {
+      log(text, page);
     },
 
     pageErrored({text, response, page}) {
-      log(text, response, page);
+      log('Error!', text, response, page);
     },
   },
 

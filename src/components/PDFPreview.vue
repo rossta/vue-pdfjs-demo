@@ -9,6 +9,8 @@
       :key="page.pageNumber"
       :is-page-focused="page.pageNumber === focusedPage"
       @page-focus="handlePageFocus"
+      @page-rendered="pageRendered"
+      @page-errored="pageErrored"
      />
   </div>
 </template>
@@ -23,7 +25,7 @@ import scroll from '../directives/scroll';
 import PDFThumbnail from './PDFThumbnail';
 
 export default {
-  props: ['pages', 'currentPage', 'pageCount'],
+  props: ['pages', 'scale', 'currentPage', 'pageCount'],
 
   components: {
     PDFThumbnail,
@@ -51,6 +53,20 @@ export default {
       this.scrollBounds = this.getScrollBounds();
     },
 
+    fetchPages(currentPage) {
+      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
+
+      this.$parent.$emit('fetch-pages', currentPage);
+    },
+
+    pageRendered(payload) {
+      this.$parent.$emit('page-rendered', payload);
+    },
+
+    pageErrored(payload) {
+      this.$parent.$emit('page-errored', payload);
+    },
+
     getScrollBounds() {
       const {scrollTop, clientHeight} = this.$el;
       return {
@@ -58,12 +74,6 @@ export default {
         bottom: scrollTop + clientHeight,
         height: clientHeight,
       };
-    },
-
-    fetchPages(currentPage) {
-      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
-
-      this.$parent.$emit('fetch-pages', currentPage);
     },
   },
 

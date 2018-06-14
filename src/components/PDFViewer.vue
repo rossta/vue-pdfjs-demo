@@ -26,7 +26,7 @@
       <PDFPreview
         slot="preview"
         slot-scope="{pages}"
-        v-bind="{pages, currentPage, pageCount}"
+        v-bind="{pages, scale, currentPage, pageCount}"
         />
       <PDFDocument
         slot="document"
