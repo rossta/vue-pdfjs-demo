@@ -99,7 +99,7 @@ export default {
 .pdf-preview {
   position: absolute;
   overflow: auto;
-  width: 20%;
+  width: 15%;
   z-index: 1;
   padding: 2em 0;
   top: 70px;

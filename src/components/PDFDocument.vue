@@ -154,8 +154,8 @@ export default {
   background: #525f69;
 }
 .pdf-document.preview-enabled {
-  width: 80%;
-  left: 20%;
+  width: 85%;
+  left: 15%;
 }
 @media print {
   .pdf-document {

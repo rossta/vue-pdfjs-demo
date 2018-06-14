@@ -7,10 +7,11 @@
     <img
       v-if="src"
       :src="src"
+      class="box-shadow"
       />
     <div
       v-else
-      class="placeholder"
+      class="placeholder box-shadow"
       >
       Loading
     </div>
@@ -158,23 +159,24 @@ export default {
   flex-direction: column;
 }
 
-img, .placeholder {
-  border: 10px solid transparent;
-  border-radius: 8px;
-  width: 75%;
+img,
+.placeholder {
+  border: 7px solid transparent;
+  border-radius: 5px;
+  width: 65%;
 }
 
 .pdf-thumbnail.focused img {
-  border-color: rgba(50, 50, 30, 0.5);
+  border-color: rgba(50, 50, 30, 0.6);
 }
 
 .placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: white;
-  height: 24vh;
+  height: 15vh;
   background-clip: content-box;
+  color: white;
 }
 
 .page-number {
