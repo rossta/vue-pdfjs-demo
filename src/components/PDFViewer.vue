@@ -19,14 +19,20 @@
     <PDFDocumentProxy
       :url="url"
       @page-count="updatePageCount"
+      @page-focus="pageFocused"
       @document-rendered="documentRendered"
       @document-errored="documentErrored"
       >
+      <PDFPreview
+        slot="preview"
+        slot-scope="{pages}"
+        v-bind="{pages, currentPage, pageCount}"
+        />
       <PDFDocument
+        slot="document"
         slot-scope="{pages}"
         v-bind="{pages, scale, currentPage, pageCount}"
         @scale-change="scaleChanged"
-        @page-focus="pageFocused"
         />
     </PDFDocumentProxy>
   </div>
@@ -36,6 +42,7 @@
 import PDFDocument from './PDFDocument';
 import PDFDocumentProxy from './PDFDocumentProxy';
 import PDFPaginator from './PDFPaginator';
+import PDFPreview from './PDFPreview';
 import PDFZoom from './PDFZoom';
 
 function round(value, precision) {
@@ -49,8 +56,9 @@ export default {
   components: {
     PDFDocument,
     PDFDocumentProxy,
-    PDFZoom,
     PDFPaginator,
+    PDFPreview,
+    PDFZoom,
   },
 
   props: {
@@ -60,15 +68,9 @@ export default {
   data() {
     return {
       scale: undefined,
-      currentPage: undefined,
+      currentPage: 1,
       pageCount: undefined,
     };
-  },
-
-  watch: {
-    url() {
-      this.currentPage = undefined;
-    },
   },
 
   methods: {
@@ -91,6 +93,16 @@ export default {
     pageFocused(pageNumber) {
       this.currentPage = pageNumber;
     },
+  },
+
+  watch: {
+    url() {
+      this.currentPage = undefined;
+    },
+  },
+
+  mounted() {
+    document.body.classList.add('overflow-hidden');
   },
 };
 </script>

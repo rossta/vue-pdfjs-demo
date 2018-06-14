@@ -1,6 +1,6 @@
 <template>
   <div
-    class="pdf-document"
+    class="pdf-document preview-enabled"
     v-bottom="fetchPages"
     v-scroll.immediate="updateScrollBounds"
     v-resize="updateScale"
@@ -9,7 +9,6 @@
       v-for="page in pages"
       v-bind="{scale, scrollBounds, page}"
       :key="page.pageNumber"
-      :ref="'page:' + page.pageNumber"
       :is-page-focused="page.pageNumber === focusedPage"
       @page-top="handlePageTop"
       @page-focus="handlePageFocus"
@@ -72,38 +71,13 @@ export default {
     };
   },
 
-  watch: {
-    pages() {
-      if (!this.focusedPage) this.updateScale();
-      this.$nextTick(() => {
-        this.focusedPage = this.currentPage;
-      });
-    },
-
-    currentPage(currentPage) {
-      if (currentPage >= this.pages.length) {
-        this.fetchPages(currentPage);
-      } else {
-        this.focusedPage = currentPage;
-      }
-    },
-
-    pageCount() {
-      this.updateScale();
-    },
-  },
-
   methods: {
     handlePageTop(scrollTop) {
       this.$el.scrollTop = scrollTop; // triggers 'scroll' event
     },
 
     handlePageFocus(pageNumber) {
-      this.$emit('page-focus', pageNumber);
-    },
-
-    updateScrollBounds() {
-      this.scrollBounds = this.getScrollBounds();
+      this.$parent.$emit('page-focus', pageNumber);
     },
 
     // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
@@ -127,6 +101,10 @@ export default {
       this.$parent.$emit('page-errored', error);
     },
 
+    updateScrollBounds() {
+      this.scrollBounds = this.getScrollBounds();
+    },
+
     getScrollBounds() {
       const {scrollTop, clientHeight} = this.$el;
       return {
@@ -142,6 +120,25 @@ export default {
       this.$parent.$emit('fetch-pages', currentPage);
     },
   },
+
+  watch: {
+    pages() {
+      if (!this.focusedPage) this.updateScale();
+      this.$nextTick(() => {
+        this.focusedPage = this.currentPage;
+      });
+    },
+
+    currentPage(currentPage) {
+      if (currentPage >= this.pages.length) {
+        this.fetchPages(currentPage);
+      } else {
+        this.focusedPage = currentPage;
+      }
+    },
+
+    pageCount: 'updateScale',
+  },
 };
 </script>
 
@@ -155,6 +152,10 @@ export default {
   left: 0;
   right: 0;
   background: #525f69;
+}
+.pdf-document.preview-enabled {
+  width: 80%;
+  left: 20%;
 }
 @media print {
   .pdf-document {

@@ -99,9 +99,13 @@ export default {
     drawPage() {
       if (this.renderTask) return;
 
+      const {viewport} = this;
+      const canvasContext = this.$el.getContext('2d');
+      const renderContext = {canvasContext, viewport};
+
       // PDFPageProxy#render
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-      this.renderTask = this.page.render(this.getRenderContext());
+      this.renderTask = this.page.render(renderContext);
       this.renderTask
         .then(() => this.$emit('page-rendered', this.page))
         .catch(response => {
@@ -113,7 +117,16 @@ export default {
         });
     },
 
-    destroyPage(page) {
+    getElementBounds() {
+      const {offsetTop, clientHeight} = this.$el;
+      return {
+        top: offsetTop,
+        bottom: offsetTop + clientHeight,
+        height: clientHeight,
+      };
+    },
+
+    destroyPage(_newPage, page) {
       // PDFPageProxy#_destroy
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       if (page) page._destroy();
@@ -132,21 +145,10 @@ export default {
 
       return {canvasContext, viewport};
     },
-
-    getElementBounds() {
-      const {offsetTop, clientHeight} = this.$el;
-      return {
-        top: offsetTop,
-        bottom: offsetTop + clientHeight,
-        height: clientHeight,
-      };
-    },
   },
 
   watch: {
-    page(page, oldPage) {
-      this.destroyPage(oldPage);
-    },
+    page: 'destroyPage',
 
     isPageFocused(isPageFocused) {
       if (isPageFocused) this.focusElement();
@@ -179,7 +181,7 @@ export default {
   },
 
   beforeDestroy() {
-    this.destroyPage(this.page);
+    this.destroyPage(undefined, this.page);
   },
 
   render(h) {

@@ -114,10 +114,15 @@ export default {
     this.$on('fetch-pages', this.fetchPages);
   },
 
-  render() {
-    return this.$scopedSlots.default({
-      pages: this.pages,
-    });
+  render(h) {
+    return h('div', [
+      this.$scopedSlots.preview({
+        pages: this.pages,
+      }),
+      this.$scopedSlots.document({
+        pages: this.pages,
+      }),
+    ]);
   },
 };
 </script>
