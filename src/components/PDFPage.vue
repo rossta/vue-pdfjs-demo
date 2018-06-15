@@ -72,7 +72,7 @@ export default {
     isElementFocused() {
       const {top: scrollTop, height: visibleHeight} = this.scrollBounds;
       const {top, bottom, height} = this.elementBounds;
-      const halfHeight = (visibleHeight / 2);
+      const halfHeight = (height / 2);
 
       return height > 0 &&
         (top - halfHeight) <= scrollTop &&
