@@ -13,7 +13,9 @@
       v-else
       class="placeholder box-shadow"
       >
-      Loading
+      <div class="content">
+        Loading
+      </div>
     </div>
     <span class="page-number">{{ pageNumber }}</span>
   </div>
@@ -157,6 +159,8 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  position: relative;
+  width: 100%;
 }
 
 img,
@@ -171,12 +175,26 @@ img,
 }
 
 .placeholder {
+  background: white;
+  background-clip: content-box;
+  position: relative;
+}
+
+.placeholder:before {
+  content: "";
+  display: block;
+  padding-top: 75%;
+}
+
+.placeholder .content {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 15vh;
-  background-clip: content-box;
-  color: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .page-number {
