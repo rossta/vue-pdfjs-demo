@@ -60,11 +60,12 @@ export default {
     },
 
     pageRendered(payload) {
-      this.$parent.$emit('page-rendered', payload);
+      this.$el.dispatchEvent(new Event('scroll'));
+      this.$parent.$emit('thumbnail-rendered', payload);
     },
 
     pageErrored(payload) {
-      this.$parent.$emit('page-errored', payload);
+      this.$parent.$emit('thumbnail-errored', payload);
     },
 
     getScrollBounds() {
