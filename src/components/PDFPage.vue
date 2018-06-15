@@ -70,7 +70,7 @@ export default {
     },
 
     isElementFocused() {
-      const {top: scrollTop, height: visibleHeight} = this.scrollBounds;
+      const {top: scrollTop} = this.scrollBounds;
       const {top, bottom, height} = this.elementBounds;
       const halfHeight = (height / 2);
 

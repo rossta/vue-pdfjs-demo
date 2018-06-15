@@ -1,6 +1,6 @@
 <template>
   <div class="pdf-preview"
-    v-bottom="fetchPages"
+    v-bottom.immediate="fetchPages"
     v-scroll.immediate="updateScrollBounds"
     >
     <PDFThumbnail

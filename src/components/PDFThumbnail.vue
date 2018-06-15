@@ -52,7 +52,6 @@ export default {
       return height > 0 &&
         bottom > scrollTop &&
         top < scrollBottom;
-
     },
   },
 
