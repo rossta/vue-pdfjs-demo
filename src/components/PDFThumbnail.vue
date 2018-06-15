@@ -160,7 +160,7 @@ img,
 }
 
 .placeholder:before {
-  content: "";
+  content: '';
   display: block;
   padding-top: 75%;
 }
