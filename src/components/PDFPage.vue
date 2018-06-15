@@ -1,6 +1,6 @@
 <script>
 import debug from 'debug';
-const log = debug('app:vue_features/documents/components/PDFPage');
+const log = debug('app:components/PDFPage');
 
 import {PIXEL_RATIO} from '../utils/constants';
 

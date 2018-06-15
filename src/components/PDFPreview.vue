@@ -3,15 +3,19 @@
     v-bottom.immediate="fetchPages"
     v-scroll.immediate="updateScrollBounds"
     >
-    <PDFThumbnail
+    <VisiblePage
       v-for="page in pages"
-      v-bind="{page, scrollBounds}"
       :key="page.pageNumber"
-      :is-page-focused="page.pageNumber === focusedPage"
-      @page-focus="handlePageFocus"
-      @page-rendered="pageRendered"
-      @page-errored="pageErrored"
-     />
+      v-bind="{page, scrollBounds}"
+      >
+      <PDFThumbnail
+        slot-scope="{page, isElementVisible}"
+        v-bind="{page, isElementVisible}"
+        :is-page-focused="page.pageNumber === focusedPage"
+        @page-focus="handlePageFocus"
+        @page-rendered="pageRendered"
+      />
+    </VisiblePage>
   </div>
 </template>
 
@@ -23,12 +27,14 @@ import bottom from '../directives/bottom';
 import scroll from '../directives/scroll';
 
 import PDFThumbnail from './PDFThumbnail';
+import VisiblePage from './VisiblePage';
 
 export default {
   props: ['pages', 'scale', 'currentPage', 'pageCount'],
 
   components: {
     PDFThumbnail,
+    VisiblePage,
   },
 
   directives: {

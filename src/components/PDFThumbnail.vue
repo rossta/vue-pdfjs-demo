@@ -26,7 +26,7 @@ import debug from 'debug';
 const log = debug('app:components/PDFThumbnail');
 
 export default {
-  props: ['page', 'scale', 'scrollBounds', 'isPageFocused'],
+  props: ['page', 'scale', 'scrollBounds', 'isPageFocused', 'isElementVisible'],
 
   data() {
     return {
@@ -43,34 +43,11 @@ export default {
     pageNumber() {
       return this.page.pageNumber;
     },
-
-    isElementVisible() {
-      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
-      const {top, height} = this.elementBounds;
-      const bottom = top + height;
-
-      return height > 0 &&
-        bottom > scrollTop &&
-        top < scrollBottom;
-    },
   },
 
   methods: {
     focusPage() {
       this.$emit('page-focus', this.pageNumber);
-    },
-
-    updateElementBounds() {
-      this.elementBounds = this.getElementBounds();
-    },
-
-    getElementBounds() {
-      const {offsetTop, clientHeight} = this.$el;
-      return {
-        top: offsetTop,
-        bottom: offsetTop + clientHeight,
-        height: clientHeight,
-      };
     },
 
     drawPage() {
@@ -125,10 +102,15 @@ export default {
       this.renderTask.cancel();
       delete this.renderTask;
     },
+
+    updateVisibility() {
+      this.$parent.$emit('update-visibility');
+    },
   },
 
   watch: {
     page: 'destroyPage',
+    src: 'updateVisibility',
 
     isElementVisible(isElementVisible) {
       if (isElementVisible) this.drawPage();
@@ -140,8 +122,6 @@ export default {
 
   mounted() {
     log(`Page ${this.pageNumber} mounted`);
-    this.updateElementBounds();
-    if (this.isElementVisible) this.drawPage();
   },
 
   beforeDestroy() {
