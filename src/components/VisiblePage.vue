@@ -1,6 +1,4 @@
 <script>
-import debug from 'debug';
-const log = debug('app:components/VisiblePage');
 export default {
   props: ['page', 'scrollBounds'],
 
