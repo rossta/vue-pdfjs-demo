@@ -3,7 +3,7 @@
     v-bottom.immediate="fetchPages"
     v-scroll.immediate="updateScrollBounds"
     >
-    <LazyPage
+    <ScrollingPage
       v-for="page in pages"
       :key="page.pageNumber"
       v-bind="{page, scrollBounds, focusedPage}"
@@ -15,7 +15,7 @@
         @thumbnail-errored="thumbnailErrored"
         @page-focus="handlePageFocus"
       />
-    </LazyPage>
+    </ScrollingPage>
   </div>
 </template>
 
@@ -24,14 +24,14 @@ import bottom from '../directives/bottom';
 import scroll from '../directives/scroll';
 
 import PDFThumbnail from './PDFThumbnail';
-import LazyPage from './LazyPage';
+import ScrollingPage from './ScrollingPage';
 
 export default {
   props: ['pages', 'scale', 'currentPage', 'pageCount'],
 
   components: {
     PDFThumbnail,
-    LazyPage,
+    ScrollingPage,
   },
 
   directives: {

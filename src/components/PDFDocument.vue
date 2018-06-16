@@ -5,7 +5,7 @@
     v-scroll.immediate="updateScrollBounds"
     v-resize="updateScale"
     >
-    <LazyPage
+    <ScrollingPage
       v-for="page in pages"
       :key="page.pageNumber"
       v-bind="{page, scrollBounds, focusedPage}"
@@ -19,7 +19,7 @@
         @page-errored="pageErrored"
         @page-focus="handlePageFocus"
       />
-    </LazyPage>
+    </ScrollingPage>
   </div>
 </template>
 
@@ -39,12 +39,12 @@ import scroll from '../directives/scroll';
 import resize from '../directives/resize';
 
 import PDFPage from './PDFPage';
-import LazyPage from './LazyPage';
+import ScrollingPage from './ScrollingPage';
 
 export default {
   components: {
     PDFPage,
-    LazyPage,
+    ScrollingPage,
   },
 
   directives: {
