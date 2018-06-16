@@ -160,7 +160,6 @@ export default {
 
   mounted() {
     log(`Page ${this.pageNumber} mounted`);
-    this.updateVisibility();
     if (this.isElementVisible) this.drawPage();
     if (this.isElementFocused) this.focusPage();
   },

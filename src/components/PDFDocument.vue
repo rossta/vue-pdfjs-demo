@@ -5,21 +5,20 @@
     v-scroll.immediate="updateScrollBounds"
     v-resize="updateScale"
     >
-    <VisiblePage
+    <LazyPage
       v-for="page in pages"
       :key="page.pageNumber"
-      v-bind="{page, scrollBounds}"
+      v-bind="{page, scrollBounds, focusedPage}"
       >
       <PDFPage
-        slot-scope="{page, isElementVisible, elementBounds}"
-        v-bind="{scale, page, isElementVisible, elementBounds}"
-        :is-page-focused="page.pageNumber === focusedPage"
+        slot-scope="{page, isElementVisible, isPageFocused, elementBounds}"
+        v-bind="{scale, page, isElementVisible, isPageFocused, elementBounds}"
         @page-top="handlePageTop"
         @page-focus="handlePageFocus"
         @page-rendered="pageRendered"
         @page-errored="pageErrored"
       />
-    </VisiblePage>
+    </LazyPage>
   </div>
 </template>
 
@@ -39,12 +38,12 @@ import scroll from '../directives/scroll';
 import resize from '../directives/resize';
 
 import PDFPage from './PDFPage';
-import VisiblePage from './VisiblePage';
+import LazyPage from './LazyPage';
 
 export default {
   components: {
     PDFPage,
-    VisiblePage,
+    LazyPage,
   },
 
   directives: {

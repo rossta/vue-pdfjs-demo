@@ -3,20 +3,19 @@
     v-bottom.immediate="fetchPages"
     v-scroll.immediate="updateScrollBounds"
     >
-    <VisiblePage
+    <LazyPage
       v-for="page in pages"
       :key="page.pageNumber"
-      v-bind="{page, scrollBounds}"
+      v-bind="{page, scrollBounds, focusedPage}"
       >
       <PDFThumbnail
-        slot-scope="{page, isElementVisible}"
-        v-bind="{page, scrollBounds, isElementVisible}"
-        :is-page-focused="page.pageNumber === focusedPage"
+        slot-scope="{page, isElementVisible, isPageFocused}"
+        v-bind="{page, scrollBounds, isElementVisible, isPageFocused}"
         @page-focus="handlePageFocus"
         @thumbnail-rendered="thumbnailRendered"
         @thumbnail-errored="thumbnailErrored"
       />
-    </VisiblePage>
+    </LazyPage>
   </div>
 </template>
 
@@ -25,14 +24,14 @@ import bottom from '../directives/bottom';
 import scroll from '../directives/scroll';
 
 import PDFThumbnail from './PDFThumbnail';
-import VisiblePage from './VisiblePage';
+import LazyPage from './LazyPage';
 
 export default {
   props: ['pages', 'scale', 'currentPage', 'pageCount'],
 
   components: {
     PDFThumbnail,
-    VisiblePage,
+    LazyPage,
   },
 
   directives: {

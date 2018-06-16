@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ['page', 'scrollBounds'],
+  props: ['page', 'scrollBounds', 'focusedPage'],
 
   data() {
     return {
@@ -9,6 +9,9 @@ export default {
   },
 
   computed: {
+    isPageFocused() {
+      return this.page.pageNumber === this.focusedPage;
+    },
     isElementVisible() {
       const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
       const {top, height} = this.elementBounds;
@@ -42,10 +45,11 @@ export default {
   },
 
   render() {
-    const {page, isElementVisible, elementBounds} = this;
+    const {page, isElementVisible, isPageFocused, elementBounds} = this;
     return this.$scopedSlots.default({
       page,
       isElementVisible,
+      isPageFocused,
       elementBounds,
     });
   },
