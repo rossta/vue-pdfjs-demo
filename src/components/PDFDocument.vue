@@ -9,14 +9,15 @@
       v-for="page in pages"
       :key="page.pageNumber"
       v-bind="{page, scrollBounds, focusedPage}"
+      :is-element-focusable="true"
+      @page-top="handlePageTop"
       >
       <PDFPage
-        slot-scope="{page, isElementVisible, isPageFocused, elementBounds}"
-        v-bind="{scale, page, isElementVisible, isPageFocused, elementBounds}"
-        @page-top="handlePageTop"
-        @page-focus="handlePageFocus"
+        slot-scope="{page, isElementVisible, isPageFocused}"
+        v-bind="{scale, page, isElementVisible, isPageFocused}"
         @page-rendered="pageRendered"
         @page-errored="pageErrored"
+        @page-focus="handlePageFocus"
       />
     </LazyPage>
   </div>

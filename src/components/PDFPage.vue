@@ -14,14 +14,6 @@ export default {
       type: Number,
       required: true,
     },
-    scrollBounds: {
-      type: Object,
-      default: () => ({}),
-    },
-    elementBounds: {
-      type: Object,
-      default: () => ({}),
-    },
     isPageFocused: {
       type: Boolean,
       default: false,
@@ -60,26 +52,9 @@ export default {
     pageNumber() {
       return this.page.pageNumber;
     },
-
-    isElementFocused() {
-      const {top: scrollTop} = this.scrollBounds;
-      const {top, bottom, height} = this.elementBounds;
-      const halfHeight = (height / 2);
-
-      return height > 0 &&
-        (top - halfHeight) <= scrollTop &&
-        scrollTop < (bottom - halfHeight);
-    },
   },
 
   methods: {
-    focusElement() {
-      if (this.isElementFocused) return;
-
-      const {top} = this.elementBounds;
-      this.$emit('page-top', top);
-    },
-
     focusPage() {
       if (this.isPageFocused) return;
 
@@ -138,10 +113,6 @@ export default {
   watch: {
     page: 'destroyPage',
     scale: 'updateVisibility',
-
-    isPageFocused(isPageFocused) {
-      if (isPageFocused) this.focusElement();
-    },
 
     isElementFocused(isElementFocused) {
       if (isElementFocused) this.focusPage();

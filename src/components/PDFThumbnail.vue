@@ -26,7 +26,24 @@ import debug from 'debug';
 const log = debug('app:components/PDFThumbnail');
 
 export default {
-  props: ['page', 'scale', 'isPageFocused', 'isElementVisible'],
+  props: {
+    page: {
+      type: Object, // instance of PDFPageProxy returned from pdf.getPage
+      required: true,
+    },
+    scale: {
+      type: Number,
+      required: true,
+    },
+    isPageFocused: {
+      type: Boolean,
+      default: false,
+    },
+    isElementVisible: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
   data() {
     return {

@@ -1,6 +1,23 @@
 <script>
 export default {
-  props: ['page', 'scrollBounds', 'focusedPage'],
+  props: {
+    page: {
+      type: Object, // instance of PDFPageProxy returned from pdf.getPage
+      required: true,
+    },
+    focusedPage: {
+      type: Number,
+      default: undefined,
+    },
+    scrollBounds: {
+      type: Object,
+      default: () => ({}),
+    },
+    isElementFocusable: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
   data() {
     return {
@@ -12,6 +29,17 @@ export default {
     isPageFocused() {
       return this.page.pageNumber === this.focusedPage;
     },
+
+    isElementFocused() {
+      const {top: scrollTop} = this.scrollBounds;
+      const {top, bottom, height} = this.elementBounds;
+      const halfHeight = (height / 2);
+
+      return height > 0 &&
+        (top - halfHeight) <= scrollTop &&
+        scrollTop < (bottom - halfHeight);
+    },
+
     isElementVisible() {
       const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
       const {top, height} = this.elementBounds;
@@ -22,6 +50,17 @@ export default {
   },
 
   methods: {
+    focusElement() {
+      if (
+        !this.isElementFocusable ||
+        this.isElementFocused ||
+        !this.isPageFocused
+      ) return;
+
+      const {top} = this.elementBounds;
+      this.$emit('page-top', top);
+    },
+
     updateElementBounds() {
       const {offsetTop, clientHeight} = this.$el;
       this.elementBounds = {
@@ -34,6 +73,7 @@ export default {
 
   watch: {
     scrollBounds: 'updateElementBounds',
+    isPageFocused: 'focusElement',
   },
 
   created() {
@@ -45,12 +85,11 @@ export default {
   },
 
   render() {
-    const {page, isElementVisible, isPageFocused, elementBounds} = this;
+    const {page, isElementVisible, isPageFocused} = this;
     return this.$scopedSlots.default({
       page,
       isElementVisible,
       isPageFocused,
-      elementBounds,
     });
   },
 }

@@ -11,9 +11,9 @@
       <PDFThumbnail
         slot-scope="{page, isElementVisible, isPageFocused}"
         v-bind="{page, scrollBounds, isElementVisible, isPageFocused}"
-        @page-focus="handlePageFocus"
         @thumbnail-rendered="thumbnailRendered"
         @thumbnail-errored="thumbnailErrored"
+        @page-focus="handlePageFocus"
       />
     </LazyPage>
   </div>
