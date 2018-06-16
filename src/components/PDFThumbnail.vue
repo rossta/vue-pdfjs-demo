@@ -71,14 +71,14 @@ export default {
           canvas.height = 0;
         })
         .then(() => {
-          this.$emit('page-rendered', {
+          this.$emit('thumbnail-rendered', {
             page: this.page,
             text: `Rendered thumbnail ${this.pageNumber}`,
           });
          })
         .catch(response => {
           this.destroyRenderTask();
-          this.$emit('page-errored', {
+          this.$emit('thumbnail-errored', {
             response,
             page: this.page,
             text: `Failed to render thumbnail ${this.pageNumber}`,

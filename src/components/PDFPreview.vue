@@ -13,16 +13,14 @@
         v-bind="{page, isElementVisible}"
         :is-page-focused="page.pageNumber === focusedPage"
         @page-focus="handlePageFocus"
-        @page-rendered="pageRendered"
+        @thumbnail-rendered="thumbnailRendered"
+        @thumbnail-errored="thumbnailErrored"
       />
     </VisiblePage>
   </div>
 </template>
 
 <script>
-// import debug from 'debug';
-// const log = debug('app:components/PDFPreview');
-
 import bottom from '../directives/bottom';
 import scroll from '../directives/scroll';
 
@@ -65,12 +63,12 @@ export default {
       this.$parent.$emit('fetch-pages', currentPage);
     },
 
-    pageRendered(payload) {
+    thumbnailRendered(payload) {
       this.$el.dispatchEvent(new Event('scroll'));
       this.$parent.$emit('thumbnail-rendered', payload);
     },
 
-    pageErrored(payload) {
+    thumbnailErrored(payload) {
       this.$parent.$emit('thumbnail-errored', payload);
     },
 
