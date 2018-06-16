@@ -18,16 +18,18 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    elementBounds: {
+      type: Object,
+      default: () => ({}),
+    },
     isPageFocused: {
       type: Boolean,
       default: false,
     },
-  },
-
-  data() {
-    return {
-      elementBounds: {},
-    };
+    isElementVisible: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -57,16 +59,6 @@ export default {
 
     pageNumber() {
       return this.page.pageNumber;
-    },
-
-    isElementVisible() {
-      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
-      const {top, height} = this.elementBounds;
-      const bottom = top + height;
-
-      return height > 0 &&
-        bottom > scrollTop &&
-        top < scrollBottom;
     },
 
     isElementFocused() {
@@ -121,17 +113,8 @@ export default {
         });
     },
 
-    updateElementBounds() {
-      this.elementBounds = this.getElementBounds();
-    },
-
-    getElementBounds() {
-      const {offsetTop, clientHeight} = this.$el;
-      return {
-        top: offsetTop,
-        bottom: offsetTop + clientHeight,
-        height: clientHeight,
-      };
+    updateVisibility() {
+      this.$parent.$emit('update-visibility');
     },
 
     destroyPage(_newPage, page) {
@@ -150,17 +133,11 @@ export default {
       this.renderTask.cancel();
       delete this.renderTask;
     },
-
-    getRenderContext() {
-      const {viewport} = this;
-      const canvasContext = this.$el.getContext('2d');
-
-      return {canvasContext, viewport};
-    },
   },
 
   watch: {
     page: 'destroyPage',
+    scale: 'updateVisibility',
 
     isPageFocused(isPageFocused) {
       if (isPageFocused) this.focusElement();
@@ -173,9 +150,6 @@ export default {
     isElementVisible(isElementVisible) {
       if (isElementVisible) this.drawPage();
     },
-
-    scale: 'updateElementBounds',
-    scrollBounds: 'updateElementBounds',
   },
 
   created() {
@@ -186,7 +160,7 @@ export default {
 
   mounted() {
     log(`Page ${this.pageNumber} mounted`);
-    this.updateElementBounds();
+    this.updateVisibility();
     if (this.isElementVisible) this.drawPage();
     if (this.isElementFocused) this.focusPage();
   },

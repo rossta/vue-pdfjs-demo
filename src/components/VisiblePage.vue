@@ -31,20 +31,24 @@ export default {
     },
   },
 
+  watch: {
+    scrollBounds: 'updateElementBounds',
+  },
+
   created() {
     this.$on('update-visibility', this.updateElementBounds);
   },
 
   mounted() {
-    log('mounted', this.$el);
     this.updateElementBounds();
   },
 
   render() {
-    const {page, isElementVisible} = this;
+    const {page, isElementVisible, elementBounds} = this;
     return this.$scopedSlots.default({
       page,
       isElementVisible,
+      elementBounds,
     });
   },
 }

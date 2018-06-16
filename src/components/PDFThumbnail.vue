@@ -26,12 +26,11 @@ import debug from 'debug';
 const log = debug('app:components/PDFThumbnail');
 
 export default {
-  props: ['page', 'scale', 'scrollBounds', 'isPageFocused', 'isElementVisible'],
+  props: ['page', 'scale', 'isPageFocused', 'isElementVisible'],
 
   data() {
     return {
       src: undefined,
-      elementBounds: {},
     };
   },
 
@@ -111,13 +110,11 @@ export default {
   watch: {
     page: 'destroyPage',
     src: 'updateVisibility',
+    scale: 'updateVisibility',
 
     isElementVisible(isElementVisible) {
       if (isElementVisible) this.drawPage();
     },
-
-    scale: 'updateElementBounds',
-    scrollBounds: 'updateElementBounds',
   },
 
   mounted() {

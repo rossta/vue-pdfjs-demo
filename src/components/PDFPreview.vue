@@ -10,7 +10,7 @@
       >
       <PDFThumbnail
         slot-scope="{page, isElementVisible}"
-        v-bind="{page, isElementVisible}"
+        v-bind="{page, scrollBounds, isElementVisible}"
         :is-page-focused="page.pageNumber === focusedPage"
         @page-focus="handlePageFocus"
         @thumbnail-rendered="thumbnailRendered"
