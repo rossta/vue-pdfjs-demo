@@ -22,6 +22,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    isElementFocused: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {

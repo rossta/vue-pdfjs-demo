@@ -10,7 +10,7 @@
       >
       <PDFThumbnail
         slot-scope="{page, isElementVisible, isPageFocused}"
-        v-bind="{page, scrollBounds, isElementVisible, isPageFocused}"
+        v-bind="{scale, page, isElementVisible, isPageFocused}"
         @thumbnail-rendered="thumbnailRendered"
         @thumbnail-errored="thumbnailErrored"
         @page-focus="handlePageFocus"

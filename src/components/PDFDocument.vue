@@ -9,12 +9,12 @@
       v-for="page in pages"
       :key="page.pageNumber"
       v-bind="{page, scrollBounds, focusedPage}"
-      :is-element-focusable="true"
-      @page-top="handlePageTop"
+      :enable-page-jump="true"
+      @page-jump="handlePageJump"
       >
       <PDFPage
-        slot-scope="{page, isElementVisible, isPageFocused}"
-        v-bind="{scale, page, isElementVisible, isPageFocused}"
+        slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
+        v-bind="{scale, page, isElementVisible, isPageFocused, isElementFocused}"
         @page-rendered="pageRendered"
         @page-errored="pageErrored"
         @page-focus="handlePageFocus"
@@ -79,7 +79,7 @@ export default {
   },
 
   methods: {
-    handlePageTop(scrollTop) {
+    handlePageJump(scrollTop) {
       this.$el.scrollTop = scrollTop; // triggers 'scroll' event
     },
 

@@ -13,7 +13,7 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    isElementFocusable: {
+    enablePageJump: {
       type: Boolean,
       default: false,
     },
@@ -50,15 +50,15 @@ export default {
   },
 
   methods: {
-    focusElement() {
+    jumpToPage() {
       if (
-        !this.isElementFocusable ||
+        !this.enablePageJump ||
         this.isElementFocused ||
         !this.isPageFocused
       ) return;
 
       const {top} = this.elementBounds;
-      this.$emit('page-top', top);
+      this.$emit('page-jump', top);
     },
 
     updateElementBounds() {
@@ -73,7 +73,7 @@ export default {
 
   watch: {
     scrollBounds: 'updateElementBounds',
-    isPageFocused: 'focusElement',
+    isPageFocused: 'jumpToPage',
   },
 
   created() {
@@ -85,11 +85,12 @@ export default {
   },
 
   render() {
-    const {page, isElementVisible, isPageFocused} = this;
+    const {page, isElementVisible, isPageFocused, isElementFocused} = this;
     return this.$scopedSlots.default({
       page,
       isElementVisible,
       isPageFocused,
+      isElementFocused,
     });
   },
 }
