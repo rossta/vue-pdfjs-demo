@@ -31,21 +31,25 @@ export default {
     },
 
     isElementFocused() {
-      const {top: scrollTop} = this.scrollBounds;
       const {top, bottom, height} = this.elementBounds;
-      const halfHeight = (height / 2);
+      if (!height) return;
 
-      return height > 0 &&
-        (top - halfHeight) <= scrollTop &&
-        scrollTop < (bottom - halfHeight);
+      const {top: scrollTop, height: clientHeight} = this.scrollBounds;
+      const halfHeight = (height / 2);
+      const halfScreen = (clientHeight / 2);
+      const delta = height >= halfScreen ? halfScreen : halfHeight;
+      const threshold = scrollTop + delta;
+
+      return top < threshold && bottom >= threshold;
     },
 
     isElementVisible() {
-      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
-      const {top, height} = this.elementBounds;
-      const bottom = top + height;
+      const {top, bottom, height} = this.elementBounds;
+      if (!height) return;
 
-      return height > 0 && bottom > scrollTop && top < scrollBottom;
+      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
+
+      return top < scrollBottom && bottom > scrollTop;
     },
   },
 
