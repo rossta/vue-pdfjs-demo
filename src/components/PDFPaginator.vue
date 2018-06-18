@@ -1,17 +1,22 @@
 <template>
   <div class="pdf-paginator">
-    <input
-      :value="value"
-      @input="input"
-      min="1"
-      :max="pageCount"
-      type="number"
-      /> / <span>{{ pageCount }}</span>
+    <template v-if="pageCount">
+      <input
+        :value="value"
+        @input="input"
+        min="1"
+        :max="pageCount"
+        type="number"
+        /> / <span>{{ pageCount }}</span>
+    </template>
+    <input v-else type="number" />
   </div>
 </template>
 
 <script>
 export default {
+  name: 'PDFPaginator',
+
   props: {
     value: Number,
     pageCount: Number,

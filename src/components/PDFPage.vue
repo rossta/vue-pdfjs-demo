@@ -137,8 +137,6 @@ export default {
 
   mounted() {
     log(`Page ${this.pageNumber} mounted`);
-    if (this.isElementVisible) this.drawPage();
-    if (this.isElementFocused) this.focusPage();
   },
 
   beforeDestroy() {

@@ -1,7 +1,7 @@
 <template>
   <div class="pdf-zoom">
-    <a @click.prevent.stop="zoomIn" class="icon"><ZoomInIcon /></a>
-    <a @click.prevent.stop="zoomOut" class="icon"><ZoomOutIcon /></a>
+    <a @click.prevent.stop="zoomIn" class="icon" :disabled="isDisabled"><ZoomInIcon /></a>
+    <a @click.prevent.stop="zoomOut" class="icon" :disabled="isDisabled"><ZoomOutIcon /></a>
   </div>
 </template>
 
@@ -10,14 +10,16 @@ import ZoomInIcon from '../assets/icon-zoom-in.svg';
 import ZoomOutIcon from '../assets/icon-zoom-out.svg';
 
 export default {
+  name: 'PDFZoom',
+
   components: {
     ZoomInIcon,
     ZoomOutIcon,
   },
+
   props: {
     scale: {
       type: Number,
-      default: 1,
     },
     increment: {
       type: Number,
@@ -25,10 +27,17 @@ export default {
     },
   },
 
+  computed: {
+    isDisabled() {
+      return !this.scale;
+    },
+  },
+
   methods: {
     zoomIn() {
       this.$emit('change', this.scale + this.increment);
     },
+
     zoomOut() {
       if (this.scale <= this.increment) return;
       this.$emit('change', this.scale - this.increment);
