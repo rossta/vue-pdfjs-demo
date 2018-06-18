@@ -5,6 +5,8 @@ const log = debug('app:components/PDFPage');
 import {PIXEL_RATIO} from '../utils/constants';
 
 export default {
+  name: 'PDFPage',
+
   props: {
     page: {
       type: Object, // instance of PDFPageProxy returned from pdf.getPage

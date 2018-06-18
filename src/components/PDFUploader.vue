@@ -60,11 +60,11 @@ export default {
             maxFiles: 1,
             maxSize: 10240000,
           })
-          .then(response => this.handleFilestack(response));
+          .then(response => this.onFilestack(response));
       });
     },
 
-    handleFilestack(response) {
+    onFilestack(response) {
       if (response.filesUploaded.length > 0) {
         const [file] = response.filesUploaded;
         this.url = file.url;

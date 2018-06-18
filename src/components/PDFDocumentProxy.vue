@@ -33,6 +33,8 @@ function getDefaults() {
 }
 
 export default {
+  name: 'PDFDocumentProxy',
+
   props: {
     url: {
       type: String,
@@ -99,19 +101,19 @@ export default {
         });
     },
 
-    pageRendered({text, page}) {
+    onPageRendered({text, page}) {
       log(text, page);
     },
 
-    pageErrored({text, response, page}) {
+    onPageErrored({text, response, page}) {
       log('Error!', text, response, page);
     },
   },
 
   created() {
-    this.$on('page-rendered', this.pageRendered);
-    this.$on('page-errored', this.pageErrored);
-    this.$on('fetch-pages', this.fetchPages);
+    this.$on('page-rendered', this.onPageRendered);
+    this.$on('page-errored', this.onPageErrored);
+    this.$on('pages-fetch', this.fetchPages);
   },
 
   render(h) {

@@ -3,7 +3,7 @@
     <header class="box-shadow">
       <PDFZoom
         :scale="scale"
-        @change="scaleChanged"
+        @change="updateScale"
         class="header-item"
         />
 
@@ -19,20 +19,21 @@
     <PDFDocumentProxy
       :url="url"
       @page-count="updatePageCount"
-      @page-focus="pageFocused"
-      @document-rendered="documentRendered"
-      @document-errored="documentErrored"
+      @page-focus="updateCurrentPage"
+      @document-rendered="onDocumentRendered"
+      @document-errored="onDocumentErrored"
       >
       <PDFPreview
         slot="preview"
         slot-scope="{pages}"
         v-bind="{pages, scale, currentPage, pageCount}"
         />
+
       <PDFDocument
         slot="document"
         slot-scope="{pages}"
         v-bind="{pages, scale, currentPage, pageCount}"
-        @scale-change="scaleChanged"
+        @scale-change="updateScale"
         />
     </PDFDocumentProxy>
   </div>
@@ -74,15 +75,15 @@ export default {
   },
 
   methods: {
-    documentRendered() {
+    onDocumentRendered() {
       this.$emit('document-errored', this.url);
     },
 
-    documentErrored(e) {
+    onDocumentErrored(e) {
       this.$emit('document-errored', e);
     },
 
-    scaleChanged(scale) {
+    updateScale(scale) {
       this.scale = round(scale, 1);
     },
 
@@ -90,7 +91,7 @@ export default {
       this.pageCount = pageCount;
     },
 
-    pageFocused(pageNumber) {
+    updateCurrentPage(pageNumber) {
       this.currentPage = pageNumber;
     },
   },

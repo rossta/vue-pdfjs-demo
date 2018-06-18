@@ -8,7 +8,7 @@
       v-for="page in pages"
       :key="page.pageNumber"
       v-bind="{page, scrollBounds, focusedPage, enablePageJump}"
-      @page-jump="handlePageJump"
+      @page-jump="onPageJump"
       >
       <template slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}">
         <slot v-bind="{page, isElementVisible, isPageFocused, isElementFocused}"></slot>
@@ -62,19 +62,11 @@ export default {
 
   methods: {
     fetchPages(currentPage) {
-      this.$emit('fetch-pages', currentPage);
+      this.$emit('pages-fetch', currentPage);
     },
 
-    handlePageJump(scrollTop) {
+    onPageJump(scrollTop) {
       this.$emit('page-jump', scrollTop);
-    },
-
-    pageRendered(payload) {
-      this.$emit('page-rendered', payload);
-    },
-
-    pageErrored(payload) {
-      this.$emit('page-errored', payload);
     },
 
     updateScrollBounds() {
@@ -89,7 +81,9 @@ export default {
 
   watch: {
     pagesLength(count, oldCount) {
-      if (oldCount === 0) this.$emit('new-pages');
+      if (oldCount === 0) this.$emit('pages-reset');
+
+      // Set focusedPage after new pages are mounted
       this.$nextTick(() => {
         this.focusedPage = this.currentPage;
       });

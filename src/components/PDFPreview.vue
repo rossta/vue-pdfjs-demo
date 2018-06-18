@@ -13,7 +13,7 @@
         v-bind="{scale, page, isElementVisible, isPageFocused}"
         @thumbnail-rendered="thumbnailRendered"
         @thumbnail-errored="thumbnailErrored"
-        @page-focus="handlePageFocus"
+        @page-focus="onPageFocus"
       />
     </ScrollingPage>
   </div>
@@ -27,11 +27,29 @@ import PDFThumbnail from './PDFThumbnail';
 import ScrollingPage from './ScrollingPage';
 
 export default {
-  props: ['pages', 'scale', 'currentPage', 'pageCount'],
+  name: 'PDFPreview',
 
   components: {
     PDFThumbnail,
     ScrollingPage,
+  },
+
+  props: {
+    pages: {
+      required: true,
+    },
+    pageCount: {
+      type: Number,
+      default: 0,
+    },
+    scale: {
+      type: Number,
+      default: 1.0,
+    },
+    currentPage: {
+      type: Number,
+      default: 1,
+    },
   },
 
   directives: {
@@ -48,7 +66,7 @@ export default {
   },
 
   methods: {
-    handlePageFocus(pageNumber) {
+    onPageFocus(pageNumber) {
       this.$parent.$emit('page-focus', pageNumber);
     },
 
@@ -59,7 +77,7 @@ export default {
     fetchPages(currentPage) {
       if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
 
-      this.$parent.$emit('fetch-pages', currentPage);
+      this.$parent.$emit('pages-fetch', currentPage);
     },
 
     thumbnailRendered(payload) {

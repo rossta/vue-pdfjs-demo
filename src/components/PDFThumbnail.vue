@@ -26,6 +26,8 @@ import debug from 'debug';
 const log = debug('app:components/PDFThumbnail');
 
 export default {
+  name: 'PDFThumbnail',
+
   props: {
     page: {
       type: Object, // instance of PDFPageProxy returned from pdf.getPage

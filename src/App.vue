@@ -3,7 +3,7 @@
 
     <PDFViewer
       v-bind="{url}"
-      @document-errored="documentErrored"
+      @document-errored="onDocumentErrored"
       >
       <PDFUploader
         v-if="enableUploader"
@@ -41,7 +41,7 @@ export default {
       this.documentError = undefined;
       this.url = url;
     },
-    documentErrored(e) {
+    onDocumentErrored(e) {
       this.documentError = e.text;
     },
   },

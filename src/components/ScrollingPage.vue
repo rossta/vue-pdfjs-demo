@@ -1,5 +1,7 @@
 <script>
 export default {
+  name: 'ScrollingPage',
+
   props: {
     page: {
       type: Object, // instance of PDFPageProxy returned from pdf.getPage

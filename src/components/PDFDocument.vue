@@ -4,16 +4,16 @@
     v-resize="updateScale"
     v-bind="{pages, pageCount, currentPage}"
     :enable-page-jump="true"
-    @page-jump="handlePageJump"
-    @fetch-pages="handleFetchPages"
-    @new-pages="updateScale"
+    @page-jump="onPageJump"
+    @pages-fetch="onPagesFetch"
+    @pages-reset="updateScale"
     >
     <PDFPage
       slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
       v-bind="{scale, page, isElementVisible, isPageFocused, isElementFocused}"
-      @page-rendered="pageRendered"
-      @page-errored="pageErrored"
-      @page-focus="handlePageFocus"
+      @page-rendered="onPageRendered"
+      @page-errored="onPageErrored"
+      @page-focus="onPageFocused"
     />
   </ScrollingDocument>
 </template>
@@ -35,6 +35,8 @@ import ScrollingDocument from './ScrollingDocument';
 import PDFPage from './PDFPage';
 
 export default {
+  name: 'PDFDocument',
+
   components: {
     ScrollingDocument,
     PDFPage,
@@ -76,25 +78,25 @@ export default {
       this.$emit('scale-change', pageWidthScale);
     },
 
-    handlePageJump(scrollTop) {
+    onPageJump(scrollTop) {
       this.$el.scrollTop = scrollTop; // triggers 'scroll' event
     },
 
-    handleFetchPages(currentPage) {
+    onPagesFetch(currentPage) {
       if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
 
-      this.$parent.$emit('fetch-pages', currentPage);
+      this.$parent.$emit('pages-fetch', currentPage);
     },
 
-    handlePageFocus(pageNumber) {
+    onPageFocused(pageNumber) {
       this.$parent.$emit('page-focus', pageNumber);
     },
 
-    pageRendered(payload) {
+    onPageRendered(payload) {
       this.$parent.$emit('page-rendered', payload);
     },
 
-    pageErrored(payload) {
+    onPageErrored(payload) {
       this.$parent.$emit('page-errored', payload);
     },
   },
