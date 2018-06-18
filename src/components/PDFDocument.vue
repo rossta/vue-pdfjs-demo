@@ -1,26 +1,21 @@
 <template>
-  <div
+  <ScrollingDocument
     class="pdf-document preview-enabled"
-    v-bottom="fetchPages"
-    v-scroll.immediate="updateScrollBounds"
     v-resize="updateScale"
+    v-bind="{pages, pageCount, currentPage}"
+    :enable-page-jump="true"
+    @page-jump="handlePageJump"
+    @fetch-pages="handleFetchPages"
+    @new-pages="updateScale"
     >
-    <ScrollingPage
-      v-for="page in pages"
-      :key="page.pageNumber"
-      v-bind="{page, scrollBounds, focusedPage}"
-      :enable-page-jump="true"
-      @page-jump="handlePageJump"
-      >
-      <PDFPage
-        slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
-        v-bind="{scale, page, isElementVisible, isPageFocused, isElementFocused}"
-        @page-rendered="pageRendered"
-        @page-errored="pageErrored"
-        @page-focus="handlePageFocus"
-      />
-    </ScrollingPage>
-  </div>
+    <PDFPage
+      slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
+      v-bind="{scale, page, isElementVisible, isPageFocused, isElementFocused}"
+      @page-rendered="pageRendered"
+      @page-errored="pageErrored"
+      @page-focus="handlePageFocus"
+    />
+  </ScrollingDocument>
 </template>
 
 <script>
@@ -34,22 +29,18 @@ const log = debug('app:components/PDFDocument');
 import {PIXEL_RATIO} from '../utils/constants';
 import responsiveScaleFactor from '../utils/responsiveScaleFactor';
 
-import bottom from '../directives/bottom';
-import scroll from '../directives/scroll';
 import resize from '../directives/resize';
 
+import ScrollingDocument from './ScrollingDocument';
 import PDFPage from './PDFPage';
-import ScrollingPage from './ScrollingPage';
 
 export default {
   components: {
+    ScrollingDocument,
     PDFPage,
-    ScrollingPage,
   },
 
   directives: {
-    bottom,
-    scroll,
     resize,
   },
 
@@ -71,22 +62,7 @@ export default {
     },
   },
 
-  data() {
-    return {
-      focusedPage: undefined,
-      scrollBounds: {},
-    };
-  },
-
   methods: {
-    handlePageJump(scrollTop) {
-      this.$el.scrollTop = scrollTop; // triggers 'scroll' event
-    },
-
-    handlePageFocus(pageNumber) {
-      this.$parent.$emit('page-focus', pageNumber);
-    },
-
     // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
     // and a subjective scale factor based on the screen size.
     updateScale() {
@@ -100,14 +76,18 @@ export default {
       this.$emit('scale-change', pageWidthScale);
     },
 
-    updateScrollBounds() {
-      this.scrollBounds = this.getScrollBounds();
+    handlePageJump(scrollTop) {
+      this.$el.scrollTop = scrollTop; // triggers 'scroll' event
     },
 
-    fetchPages(currentPage) {
+    handleFetchPages(currentPage) {
       if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
 
       this.$parent.$emit('fetch-pages', currentPage);
+    },
+
+    handlePageFocus(pageNumber) {
+      this.$parent.$emit('page-focus', pageNumber);
     },
 
     pageRendered(payload) {
@@ -117,33 +97,9 @@ export default {
     pageErrored(payload) {
       this.$parent.$emit('page-errored', payload);
     },
-
-    getScrollBounds() {
-      const {scrollTop, clientHeight} = this.$el;
-      return {
-        top: scrollTop,
-        bottom: scrollTop + clientHeight,
-        height: clientHeight,
-      };
-    },
   },
 
   watch: {
-    pages() {
-      if (!this.focusedPage) this.updateScale();
-      this.$nextTick(() => {
-        this.focusedPage = this.currentPage;
-      });
-    },
-
-    currentPage(currentPage) {
-      if (currentPage > this.pages.length) {
-        this.fetchPages(currentPage);
-      } else {
-        this.focusedPage = currentPage;
-      }
-    },
-
     pageCount: 'updateScale',
   },
 };

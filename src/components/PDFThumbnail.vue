@@ -32,7 +32,6 @@ export default {
       required: true,
     },
     scale: {
-      type: Number,
       required: true,
     },
     isPageFocused: {

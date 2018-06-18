@@ -55,13 +55,9 @@ export default {
 
   methods: {
     jumpToPage() {
-      if (
-        !this.enablePageJump ||
-        this.isElementFocused ||
-        !this.isPageFocused
-      ) return;
-
+      if (!this.enablePageJump || this.isElementFocused || !this.isPageFocused) return;
       const {top} = this.elementBounds;
+
       this.$emit('page-jump', top);
     },
 
@@ -88,14 +84,18 @@ export default {
     this.updateElementBounds();
   },
 
-  render() {
+  render(h ) {
     const {page, isElementVisible, isPageFocused, isElementFocused} = this;
-    return this.$scopedSlots.default({
-      page,
-      isElementVisible,
-      isPageFocused,
-      isElementFocused,
-    });
+    return h('div', {
+        class: 'scrolling-page',
+      }, [
+        this.$scopedSlots.default({
+          page,
+          isElementVisible,
+          isPageFocused,
+          isElementFocused,
+        }),
+      ]);
   },
 }
 </script>
