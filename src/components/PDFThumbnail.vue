@@ -165,7 +165,7 @@ img,
 }
 
 .pdf-thumbnail.focused img {
-  border-color: rgba(50, 50, 30, 0.6);
+  border-color: rgba(68, 204, 139, 0.65);
 }
 
 .placeholder {
