@@ -1,37 +1,29 @@
 <template>
-  <div class="pdf-preview"
-    v-bottom.immediate="fetchPages"
-    v-scroll.immediate="updateScrollBounds"
+  <ScrollingDocument
+    class="pdf-preview"
+    @pages-fetch="onPagesFetch"
+    v-bind="{pages, pageCount, currentPage}"
     >
-    <ScrollingPage
-      v-for="page in pages"
-      :key="page.pageNumber"
-      v-bind="{page, scrollBounds, focusedPage}"
-      >
-      <PDFThumbnail
-        slot-scope="{page, isElementVisible, isPageFocused}"
-        v-bind="{scale, page, isElementVisible, isPageFocused}"
-        @thumbnail-rendered="thumbnailRendered"
-        @thumbnail-errored="thumbnailErrored"
-        @page-focus="onPageFocus"
+    <PDFThumbnail
+      slot-scope="{page, isElementVisible, isPageFocused}"
+      v-bind="{scale, page, isElementVisible, isPageFocused}"
+      @thumbnail-rendered="thumbnailRendered"
+      @thumbnail-errored="thumbnailErrored"
+      @page-focus="onPageFocused"
       />
-    </ScrollingPage>
-  </div>
+  </ScrollingDocument>
 </template>
 
 <script>
-import bottom from '../directives/bottom';
-import scroll from '../directives/scroll';
-
+import ScrollingDocument from './ScrollingDocument';
 import PDFThumbnail from './PDFThumbnail';
-import ScrollingPage from './ScrollingPage';
 
 export default {
   name: 'PDFPreview',
 
   components: {
+    ScrollingDocument,
     PDFThumbnail,
-    ScrollingPage,
   },
 
   props: {
@@ -52,32 +44,13 @@ export default {
     },
   },
 
-  directives: {
-    bottom,
-    scroll,
-  },
-
-
-  data() {
-    return {
-      focusedPage: undefined,
-      scrollBounds: {},
-    };
-  },
-
   methods: {
-    onPageFocus(pageNumber) {
-      this.$parent.$emit('page-focus', pageNumber);
-    },
-
-    updateScrollBounds() {
-      this.scrollBounds = this.getScrollBounds();
-    },
-
-    fetchPages(currentPage) {
-      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
-
+    onPagesFetch(currentPage) {
       this.$parent.$emit('pages-fetch', currentPage);
+    },
+
+    onPageFocused(pageNumber) {
+      this.$parent.$emit('page-focus', pageNumber);
     },
 
     thumbnailRendered(payload) {
@@ -87,31 +60,6 @@ export default {
 
     thumbnailErrored(payload) {
       this.$parent.$emit('thumbnail-errored', payload);
-    },
-
-    getScrollBounds() {
-      const {scrollTop, clientHeight} = this.$el;
-      return {
-        top: scrollTop,
-        bottom: scrollTop + clientHeight,
-        height: clientHeight,
-      };
-    },
-  },
-
-  watch: {
-    pages() {
-      this.$nextTick(() => {
-        this.focusedPage = this.currentPage;
-      });
-    },
-
-    currentPage(currentPage) {
-      if (currentPage > this.pages.length) {
-        this.fetchPages(currentPage);
-      } else {
-        this.focusedPage = currentPage;
-      }
     },
   },
 };
