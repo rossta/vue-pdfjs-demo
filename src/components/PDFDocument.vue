@@ -62,6 +62,9 @@ export default {
       type: Number,
       default: 1,
     },
+    isPreviewEnabled: {
+      default: false,
+    },
   },
 
   methods: {
@@ -101,6 +104,7 @@ export default {
 
   watch: {
     pageCount: 'updateScale',
+    isPreviewEnabled: 'updateScale',
   },
 };
 </script>

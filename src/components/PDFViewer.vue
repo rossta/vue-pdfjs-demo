@@ -4,6 +4,10 @@
     :class="{ 'preview-enabled' : isPreviewEnabled }"
     >
     <header class="pdf-viewer__header box-shadow">
+      <div class="pdf-preview-toggle">
+        <a @click.prevent.stop="togglePreview" class="icon"><PreviewIcon /></a>
+      </div>
+
       <PDFZoom
         :scale="scale"
         @change="updateScale"
@@ -38,7 +42,7 @@
         class="pdf-viewer__document"
         slot="document"
         slot-scope="{pages}"
-        v-bind="{pages, scale, currentPage, pageCount}"
+        v-bind="{pages, scale, currentPage, pageCount, isPreviewEnabled}"
         @scale-change="updateScale"
         />
     </PDFDocumentProxy>
@@ -46,6 +50,8 @@
 </template>
 
 <script>
+import PreviewIcon from '../assets/icon-preview.svg';
+
 import PDFDocument from './PDFDocument';
 import PDFDocumentProxy from './PDFDocumentProxy';
 import PDFPaginator from './PDFPaginator';
@@ -66,6 +72,7 @@ export default {
     PDFPaginator,
     PDFPreview,
     PDFZoom,
+    PreviewIcon,
   },
 
   props: {
@@ -100,6 +107,10 @@ export default {
 
     updateCurrentPage(pageNumber) {
       this.currentPage = pageNumber;
+    },
+
+    togglePreview() {
+      this.isPreviewEnabled = !this.isPreviewEnabled;
     },
   },
 
@@ -140,15 +151,40 @@ header {
 
 .pdf-viewer.preview-enabled .pdf-viewer__preview {
   display: block;
+  /* animation: butt-in 100ms ease-out; */
   width: 15%;
   right: 85%;
 }
 
 .pdf-viewer.preview-enabled .pdf-viewer__document {
   top: 70px;
+  /* animation: make-room 100ms ease-out; */
   width: 85%;
   left: 15%;
 }
+
+@keyframes butt-in {
+  0% {
+    width: 0;
+    right: 100%;
+  }
+  100% {
+    width: 15%;
+    right: 85%;
+  }
+}
+
+@keyframes make-room {
+  0% {
+    width: 100%;
+    left: 0;
+  }
+  100% {
+    width: 85%;
+    left: 15%;
+  }
+}
+
 
 @media print {
   header {

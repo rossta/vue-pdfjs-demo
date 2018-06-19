@@ -2,8 +2,8 @@ export default function getScaleFactor() {
   const [LARGE, MIDDLE, SMALL] = [480, 768, 1024];
   const SCALE_FACTORS = {
     [SMALL]: 0.95,
-    [MIDDLE]: 0.85,
-    [LARGE]: 0.75
+    [MIDDLE]: 0.90,
+    [LARGE]: 0.85
   };
   const clientWidth = document.body.clientWidth;
   if (clientWidth > LARGE) {
