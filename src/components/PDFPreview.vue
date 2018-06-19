@@ -7,8 +7,8 @@
     <PDFThumbnail
       slot-scope="{page, isElementVisible, isPageFocused}"
       v-bind="{scale, page, isElementVisible, isPageFocused}"
-      @thumbnail-rendered="thumbnailRendered"
-      @thumbnail-errored="thumbnailErrored"
+      @thumbnail-rendered="onThumbnailRendered"
+      @thumbnail-errored="onThumbnailErrored"
       @page-focus="onPageFocused"
       />
   </ScrollingDocument>
@@ -53,12 +53,12 @@ export default {
       this.$parent.$emit('page-focus', pageNumber);
     },
 
-    thumbnailRendered(payload) {
+    onThumbnailRendered(payload) {
       this.$el.dispatchEvent(new Event('scroll'));
       this.$parent.$emit('thumbnail-rendered', payload);
     },
 
-    thumbnailErrored(payload) {
+    onThumbnailErrored(payload) {
       this.$parent.$emit('thumbnail-errored', payload);
     },
   },
@@ -69,12 +69,11 @@ export default {
 .pdf-preview {
   position: absolute;
   overflow: auto;
-  width: 15%;
   z-index: 1;
   padding: 2em 0;
-  top: 70px;
+  top: 0;
   left: 0;
-  right: 80%;
+  right: 0;
   bottom: 0;
 }
 @media print {

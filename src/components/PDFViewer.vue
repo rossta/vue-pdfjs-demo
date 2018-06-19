@@ -1,6 +1,9 @@
 <template>
-  <div class="pdf-viewer">
-    <header class="box-shadow">
+  <div
+    class="pdf-viewer"
+    :class="{ 'preview-enabled' : isPreviewEnabled }"
+    >
+    <header class="pdf-viewer__header box-shadow">
       <PDFZoom
         :scale="scale"
         @change="updateScale"
@@ -17,6 +20,7 @@
     </header>
 
     <PDFDocumentProxy
+      class="pdf-viewer__main"
       :url="url"
       @page-count="updatePageCount"
       @page-focus="updateCurrentPage"
@@ -24,12 +28,14 @@
       @document-errored="onDocumentErrored"
       >
       <PDFPreview
+        class="pdf-viewer__preview"
         slot="preview"
         slot-scope="{pages}"
         v-bind="{pages, scale, currentPage, pageCount}"
         />
 
       <PDFDocument
+        class="pdf-viewer__document"
         slot="document"
         slot-scope="{pages}"
         v-bind="{pages, scale, currentPage, pageCount}"
@@ -71,6 +77,7 @@ export default {
       scale: undefined,
       currentPage: 1,
       pageCount: undefined,
+      isPreviewEnabled: true,
     };
   },
 
@@ -120,6 +127,27 @@ header {
 }
 .header-item {
   margin: 0 2.5em;
+}
+
+.pdf-viewer .pdf-viewer__document,
+.pdf-viewer .pdf-viewer__preview {
+  top: 70px;
+}
+
+.pdf-viewer__preview {
+  display: none;
+}
+
+.pdf-viewer.preview-enabled .pdf-viewer__preview {
+  display: block;
+  width: 15%;
+  right: 85%;
+}
+
+.pdf-viewer.preview-enabled .pdf-viewer__document {
+  top: 70px;
+  width: 85%;
+  left: 15%;
 }
 
 @media print {
