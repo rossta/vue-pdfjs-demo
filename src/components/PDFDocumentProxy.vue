@@ -72,14 +72,14 @@ export default {
 
   computed: {
     pageCount() {
-      return this.pdf && this.pdf.numPages;
+      return this.pdf ? this.pdf.numPages : 0;
     },
   },
 
   methods: {
     fetchPages(currentPage = 0) {
       if (!this.pdf) return;
-      if (this.pages.length === this.pageCount) return;
+      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
 
       const startIndex = this.pages.length;
       if (this.cursor > startIndex) return;

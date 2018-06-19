@@ -83,8 +83,6 @@ export default {
     },
 
     onPagesFetch(currentPage) {
-      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
-
       this.$parent.$emit('pages-fetch', currentPage);
     },
 
