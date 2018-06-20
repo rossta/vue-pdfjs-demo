@@ -95,7 +95,7 @@ export default {
           this.pages.splice(startIndex, deleteCount, ...pages);
           return this.pages;
         })
-        .catch(response => {
+        .catch((response) => {
           this.$emit('document-errored', {text: 'Failed to retrieve pages', response});
           log('Failed to retrieve pages', response);
         });
