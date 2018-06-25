@@ -50,6 +50,8 @@
 </template>
 
 <script>
+import round from '../utils/round';
+
 import PreviewIcon from '../assets/icon-preview.svg';
 
 import PDFDocument from './PDFDocument';
@@ -57,11 +59,6 @@ import PDFDocumentProxy from './PDFDocumentProxy';
 import PDFPaginator from './PDFPaginator';
 import PDFPreview from './PDFPreview';
 import PDFZoom from './PDFZoom';
-
-function round(value, precision) {
-  const multiplier = Math.pow(10, precision || 0);
-  return Math.round(value * multiplier) / multiplier;
-}
 
 export default {
   name: 'PDFViewer',
@@ -84,7 +81,7 @@ export default {
       scale: undefined,
       currentPage: 1,
       pageCount: undefined,
-      isPreviewEnabled: true,
+      isPreviewEnabled: false,
     };
   },
 

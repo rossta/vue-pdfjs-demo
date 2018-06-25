@@ -26,6 +26,7 @@
 import debug from 'debug';
 const log = debug('app:components/PDFDocument');
 
+import round from '../utils/round';
 import {PIXEL_RATIO} from '../utils/constants';
 import responsiveScaleFactor from '../utils/responsiveScaleFactor';
 
@@ -67,17 +68,37 @@ export default {
     },
   },
 
+  computed: {
+    firstPage() {
+      if (!this.pages.length) return undefined;
+      const [page] = this.pages;
+      return page;
+    },
+
+    defaultViewportWidth() {
+      return this.firstPage ? this.firstPage.getViewport(1.0).width : 0;
+    },
+
+    scaleFactor() {
+      const {firstPage, defaultViewportWidth} = this;
+      if (!firstPage) return 0;
+
+      const width = this.$el.clientWidth;
+      return round((this.scale * defaultViewportWidth) / (width * PIXEL_RATIO), 2);
+    }
+  },
+
   methods: {
     // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
     // and a subjective scale factor based on the screen size.
     updateScale() {
-      if (!this.pages.length) return;
-      const [page] = this.pages;
-      const width = this.$el.clientWidth;
-      const defaultViewport = page.getViewport(1.0);
-      const pageWidthScale = (width * PIXEL_RATIO) * responsiveScaleFactor() / defaultViewport.width;
+      const {defaultViewportWidth} = this;
+      if (!defaultViewportWidth) return;
 
-      log('calculating initial scale', width, defaultViewport.width, pageWidthScale);
+      const width = this.$el.clientWidth;
+      const pageWidthScale = (width * PIXEL_RATIO) * responsiveScaleFactor() / defaultViewportWidth;
+
+      log('calculating initial scale', width, defaultViewportWidth, pageWidthScale);
       this.$emit('scale-change', pageWidthScale);
     },
 
@@ -104,7 +125,12 @@ export default {
 
   watch: {
     pageCount: 'updateScale',
-    isPreviewEnabled: 'updateScale',
+    isPreviewEnabled() {
+      log('factor', this.scaleFactor);
+      if (this.scaleFactor === responsiveScaleFactor()) {
+        this.updateScale();
+      }
+    },
   },
 };
 </script>
