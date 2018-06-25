@@ -3,6 +3,7 @@
     class="pdf-preview"
     @pages-fetch="onPagesFetch"
     v-bind="{pages, pageCount, currentPage}"
+    :is-parent-visible="isPreviewEnabled"
     >
     <PDFThumbnail
       slot-scope="{page, isElementVisible, isPageFocused}"
@@ -41,6 +42,9 @@ export default {
     currentPage: {
       type: Number,
       default: 1,
+    },
+    isPreviewEnabled: {
+      default: false,
     },
   },
 

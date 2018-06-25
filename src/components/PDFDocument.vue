@@ -1,6 +1,6 @@
 <template>
   <ScrollingDocument
-    class="pdf-document preview-enabled"
+    class="pdf-document"
     v-resize="updateScale"
     v-bind="{pages, pageCount, currentPage}"
     :enable-page-jump="true"
@@ -26,8 +26,7 @@
 import debug from 'debug';
 const log = debug('app:components/PDFDocument');
 
-import {PIXEL_RATIO} from '../utils/constants';
-import responsiveScaleFactor from '../utils/responsiveScaleFactor';
+import {PIXEL_RATIO, VIEWPORT_RATIO} from '../utils/constants';
 
 import resize from '../directives/resize';
 
@@ -75,9 +74,9 @@ export default {
       const [page] = this.pages;
       const width = this.$el.clientWidth;
       const defaultViewport = page.getViewport(1.0);
-      const pageWidthScale = (width * PIXEL_RATIO) * responsiveScaleFactor() / defaultViewport.width;
+      const pageWidthScale = (width * PIXEL_RATIO) * VIEWPORT_RATIO / defaultViewport.width;
 
-      log('calculating initial scale', width, defaultViewport.width, pageWidthScale);
+      log('calculating initial scale', pageWidthScale);
       this.$emit('scale-change', pageWidthScale);
     },
 

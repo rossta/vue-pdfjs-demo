@@ -131,7 +131,7 @@ export default {
     scale: 'updateVisibility',
 
     isElementVisible(isElementVisible) {
-      if (isElementVisible) this.drawPage();
+      if (isElementVisible && !this.src) this.drawPage();
     },
   },
 

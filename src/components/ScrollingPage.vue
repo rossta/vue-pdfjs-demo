@@ -87,12 +87,11 @@ export default {
   },
 
   render(h ) {
-    const {page, isElementVisible, isPageFocused, isElementFocused} = this;
+    const {isElementVisible, isPageFocused, isElementFocused} = this;
     return h('div', {
         class: 'scrolling-page',
       }, [
         this.$scopedSlots.default({
-          page,
           isElementVisible,
           isPageFocused,
           isElementFocused,

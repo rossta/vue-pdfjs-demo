@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="pdf-viewer"
-    :class="{ 'preview-enabled' : isPreviewEnabled }"
-    >
+  <div class="pdf-viewer">
     <header class="pdf-viewer__header box-shadow">
       <div class="pdf-preview-toggle">
         <a @click.prevent.stop="togglePreview" class="icon"><PreviewIcon /></a>
@@ -31,15 +28,18 @@
       @document-rendered="onDocumentRendered"
       @document-errored="onDocumentErrored"
       >
+
       <PDFPreview
-        class="pdf-viewer__preview"
         slot="preview"
         slot-scope="{pages}"
-        v-bind="{pages, scale, currentPage, pageCount}"
+        v-show="isPreviewEnabled"
+        class="pdf-viewer__preview"
+        v-bind="{pages, scale, currentPage, pageCount, isPreviewEnabled}"
         />
 
       <PDFDocument
         class="pdf-viewer__document"
+        :class="{ 'preview-enabled': isPreviewEnabled }"
         slot="document"
         slot-scope="{pages}"
         v-bind="{pages, scale, currentPage, pageCount, isPreviewEnabled}"
@@ -58,9 +58,9 @@ import PDFPaginator from './PDFPaginator';
 import PDFPreview from './PDFPreview';
 import PDFZoom from './PDFZoom';
 
-function round(value, precision) {
+function floor(value, precision) {
   const multiplier = Math.pow(10, precision || 0);
-  return Math.round(value * multiplier) / multiplier;
+  return Math.floor(value * multiplier) / multiplier;
 }
 
 export default {
@@ -84,7 +84,7 @@ export default {
       scale: undefined,
       currentPage: 1,
       pageCount: undefined,
-      isPreviewEnabled: true,
+      isPreviewEnabled: false,
     };
   },
 
@@ -98,7 +98,7 @@ export default {
     },
 
     updateScale(scale) {
-      this.scale = round(scale, 1);
+      this.scale = floor(scale, 2);
     },
 
     updatePageCount(pageCount) {
@@ -146,45 +146,21 @@ header {
 }
 
 .pdf-viewer__preview {
-  display: none;
-}
-
-.pdf-viewer.preview-enabled .pdf-viewer__preview {
   display: block;
-  /* animation: butt-in 100ms ease-out; */
   width: 15%;
   right: 85%;
 }
 
-.pdf-viewer.preview-enabled .pdf-viewer__document {
+.pdf-viewer__document {
   top: 70px;
-  /* animation: make-room 100ms ease-out; */
+  width: 100%;
+  left: 0;
+}
+
+.pdf-viewer__document.preview-enabled {
   width: 85%;
   left: 15%;
 }
-
-@keyframes butt-in {
-  0% {
-    width: 0;
-    right: 100%;
-  }
-  100% {
-    width: 15%;
-    right: 85%;
-  }
-}
-
-@keyframes make-room {
-  0% {
-    width: 100%;
-    left: 0;
-  }
-  100% {
-    width: 85%;
-    left: 15%;
-  }
-}
-
 
 @media print {
   header {
