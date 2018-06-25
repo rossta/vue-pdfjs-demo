@@ -26,9 +26,8 @@
 import debug from 'debug';
 const log = debug('app:components/PDFDocument');
 
-import round from '../utils/round';
-import {PIXEL_RATIO} from '../utils/constants';
-import responsiveScaleFactor from '../utils/responsiveScaleFactor';
+import floor from '../utils/floor';
+import {PIXEL_RATIO, VIEWPORT_RATIO} from '../utils/constants';
 
 import resize from '../directives/resize';
 
@@ -68,6 +67,12 @@ export default {
     },
   },
 
+  data() {
+    return {
+      baseScaleFactor: undefined,
+    };
+  },
+
   computed: {
     firstPage() {
       if (!this.pages.length) return undefined;
@@ -78,28 +83,30 @@ export default {
     defaultViewportWidth() {
       return this.firstPage ? this.firstPage.getViewport(1.0).width : 0;
     },
-
-    scaleFactor() {
-      const {firstPage, defaultViewportWidth} = this;
-      if (!firstPage) return 0;
-
-      const width = this.$el.clientWidth;
-      return round((this.scale * defaultViewportWidth) / (width * PIXEL_RATIO), 2);
-    }
   },
 
   methods: {
     // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
     // and a subjective scale factor based on the screen size.
-    updateScale() {
+    updateScale(newCount, oldCount) {
       const {defaultViewportWidth} = this;
       if (!defaultViewportWidth) return;
 
-      const width = this.$el.clientWidth;
-      const pageWidthScale = (width * PIXEL_RATIO) * responsiveScaleFactor() / defaultViewportWidth;
+      const scaleFactor = this.scaleFactor();
+      if (oldCount === 0) {
+        this.baseScaleFactor = scaleFactor;
+      }
 
-      log('calculating initial scale', width, defaultViewportWidth, pageWidthScale);
+      const pageWidthScale = scaleFactor * VIEWPORT_RATIO;
+
+      log('calculating initial scale', pageWidthScale);
       this.$emit('scale-change', pageWidthScale);
+    },
+
+    scaleFactor() {
+      const {defaultViewportWidth} = this;
+      const pixelWidth = this.$el.clientWidth * PIXEL_RATIO;
+      return floor(pixelWidth / defaultViewportWidth, 2);
     },
 
     onPageJump(scrollTop) {
@@ -126,8 +133,8 @@ export default {
   watch: {
     pageCount: 'updateScale',
     isPreviewEnabled() {
-      log('factor', this.scaleFactor);
-      if (this.scaleFactor === responsiveScaleFactor()) {
+      log('factor', this.scaleFactor, this.baseScaleFactor);
+      if (this.baseScaleFactor === this.scaleFactor) {
         this.updateScale();
       }
     },

@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import round from '../utils/round';
+import floor from '../utils/floor';
 
 import PreviewIcon from '../assets/icon-preview.svg';
 
@@ -79,9 +79,10 @@ export default {
   data() {
     return {
       scale: undefined,
+      initialScale: undefined,
       currentPage: 1,
       pageCount: undefined,
-      isPreviewEnabled: false,
+      isPreviewEnabled: true,
     };
   },
 
@@ -95,7 +96,7 @@ export default {
     },
 
     updateScale(scale) {
-      this.scale = round(scale, 1);
+      this.scale = floor(scale, 2);
     },
 
     updatePageCount(pageCount) {
