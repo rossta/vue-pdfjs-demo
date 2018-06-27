@@ -8,6 +8,7 @@
       <PDFZoom
         :scale="scale"
         @change="updateScale"
+        @fit="updateFit"
         class="header-item"
         />
 
@@ -42,7 +43,7 @@
         :class="{ 'preview-enabled': isPreviewEnabled }"
         slot="document"
         slot-scope="{pages}"
-        v-bind="{pages, scale, currentPage, pageCount, isPreviewEnabled}"
+        v-bind="{pages, scale, fit, currentPage, pageCount, isPreviewEnabled}"
         @scale-change="updateScale"
         />
     </PDFDocumentProxy>
@@ -82,6 +83,7 @@ export default {
   data() {
     return {
       scale: undefined,
+      fit: undefined,
       currentPage: 1,
       pageCount: undefined,
       isPreviewEnabled: false,
@@ -99,6 +101,10 @@ export default {
 
     updateScale(scale) {
       this.scale = floor(scale, 2);
+    },
+
+    updateFit(fit) {
+      this.fit = fit;
     },
 
     updatePageCount(pageCount) {

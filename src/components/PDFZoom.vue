@@ -2,12 +2,16 @@
   <div class="pdf-zoom">
     <a @click.prevent.stop="zoomIn" class="icon" :disabled="isDisabled"><ZoomInIcon /></a>
     <a @click.prevent.stop="zoomOut" class="icon" :disabled="isDisabled"><ZoomOutIcon /></a>
+    <a @click.prevent.stop="fitWidth" class="icon" :disabled="isDisabled"><ExpandIcon /></a>
+    <a @click.prevent.stop="fitAuto" class="icon" :disabled="isDisabled"><ShrinkIcon /></a>
   </div>
 </template>
 
 <script>
 import ZoomInIcon from '../assets/icon-zoom-in.svg';
 import ZoomOutIcon from '../assets/icon-zoom-out.svg';
+import ExpandIcon from '../assets/icon-expand.svg';
+import ShrinkIcon from '../assets/icon-shrink.svg';
 
 export default {
   name: 'PDFZoom',
@@ -15,6 +19,8 @@ export default {
   components: {
     ZoomInIcon,
     ZoomOutIcon,
+    ExpandIcon,
+    ShrinkIcon,
   },
 
   props: {
@@ -41,6 +47,14 @@ export default {
     zoomOut() {
       if (this.scale <= this.increment) return;
       this.$emit('change', this.scale - this.increment);
+    },
+
+    fitWidth() {
+      this.$emit('fit', 'width');
+    },
+
+    fitAuto() {
+      this.$emit('fit', 'auto');
     },
   },
 }

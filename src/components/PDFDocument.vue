@@ -1,12 +1,12 @@
 <template>
   <ScrollingDocument
     class="pdf-document"
-    v-resize="updateScale"
+    v-resize="fitWidth"
     v-bind="{pages, pageCount, currentPage}"
     :enable-page-jump="true"
     @page-jump="onPageJump"
     @pages-fetch="onPagesFetch"
-    @pages-reset="updateScale"
+    @pages-reset="fitWidth"
     >
     <PDFPage
       slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
@@ -57,6 +57,9 @@ export default {
       type: Number,
       default: 1.0,
     },
+    fit: {
+      type: String,
+    },
     currentPage: {
       type: Number,
       default: 1,
@@ -66,18 +69,52 @@ export default {
     },
   },
 
+  computed: {
+    defaultViewport() {
+      if (!this.pages.length) return {width: 0, height:0};
+      const [page] = this.pages;
+
+      return page.getViewport(1.0);
+    },
+
+    isPortrait() {
+      const {width, height} = this.defaultViewport;
+      return width <= height;
+    },
+  },
+
   methods: {
+    pageWidthScale() {
+      const {defaultViewport, $el} = this;
+      if (!defaultViewport.width) return 0;
+
+      return ($el.clientWidth * PIXEL_RATIO) * VIEWPORT_RATIO / defaultViewport.width;
+    },
+
+    pageHeightScale() {
+      const {defaultViewport, $el} = this;
+      if (!defaultViewport.height) return 0;
+
+      return ($el.clientHeight * PIXEL_RATIO) * VIEWPORT_RATIO / defaultViewport.height;
+    },
     // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
     // and a subjective scale factor based on the screen size.
-    updateScale() {
-      if (!this.pages.length) return;
-      const [page] = this.pages;
-      const width = this.$el.clientWidth;
-      const defaultViewport = page.getViewport(1.0);
-      const pageWidthScale = (width * PIXEL_RATIO) * VIEWPORT_RATIO / defaultViewport.width;
+    fitWidth() {
+      const scale = this.pageWidthScale();
+      log('fit width scale', scale);
+      this.$emit('scale-change', scale);
+    },
 
-      log('calculating initial scale', pageWidthScale);
-      this.$emit('scale-change', pageWidthScale);
+    fitHeight() {
+      const scale = this.isPortrait ? this.pageHeightScale() : this.pageWidthScale();
+      log('fit height scale', scale);
+      this.$emit('scale-change', scale);
+    },
+
+    fitAuto() {
+      const scale = Math.min(this.pageWidthScale(), this.pageHeightScale());
+      log('fit auto scale', scale);
+      this.$emit('scale-change', scale);
     },
 
     onPageJump(scrollTop) {
@@ -102,8 +139,22 @@ export default {
   },
 
   watch: {
-    pageCount: 'updateScale',
-    isPreviewEnabled: 'updateScale',
+    fit(fit) {
+      switch (fit) {
+        case 'width':
+          this.fitWidth();
+          break;
+
+        case 'auto':
+          this.fitAuto();
+          break;
+
+        default:
+          break;
+      }
+    },
+    pageCount: 'fitWidth',
+    isPreviewEnabled: 'fitWidth',
   },
 };
 </script>

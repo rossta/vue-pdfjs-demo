@@ -98,7 +98,7 @@ export default {
       this.$parent.$emit('update-visibility');
     },
 
-    destroyPage(_newPage, page) {
+    destroyPage(page) {
       // PDFPageProxy#_destroy
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
       if (page) page._destroy();
@@ -117,8 +117,11 @@ export default {
   },
 
   watch: {
-    page: 'destroyPage',
     scale: 'updateVisibility',
+
+    page(_newPage, oldPage) {
+      this.destroyPage(oldPage);
+    },
 
     isElementFocused(isElementFocused) {
       if (isElementFocused) this.focusPage();
@@ -140,7 +143,7 @@ export default {
   },
 
   beforeDestroy() {
-    this.destroyPage(undefined, this.page);
+    this.destroyPage(this.page);
   },
 
   render(h) {
