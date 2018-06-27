@@ -2,14 +2,12 @@
 import debug from 'debug';
 const log = debug('app:vue_features/documents/components/PDFPage');
 
-const CSS_UNITS = 96.0  / 72.0;
-
 export default {
   props: ['page', 'scale'],
 
   computed: {
     actualSizeViewport() {
-      return this.viewport.clone({scale: this.scale * CSS_UNITS});
+      return this.viewport.clone({scale: this.scale});
     },
 
     canvasStyle() {
@@ -40,14 +38,12 @@ export default {
 
   methods: {
     renderPage() {
-      this.$nextTick(() => {
-        // PDFPageProxy#render
-        // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-        this.renderTask = this.page.render(this.getRenderContext());
-        this.renderTask.
-          then(() => this.$emit('rendered', this.page)).
-          then(() => log(`Page ${this.pageNumber} rendered`));
-      });
+      // PDFPageProxy#render
+      // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
+      this.renderTask = this.page.render(this.getRenderContext());
+      this.renderTask.
+        then(() => this.$emit('rendered', this.page)).
+        then(() => log(`Page ${this.pageNumber} rendered`));
     },
 
     destroyPage(page) {
@@ -79,7 +75,7 @@ export default {
   created() {
     // PDFPageProxy#getViewport
     // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-    this.viewport = this.page.getViewport(this.scale * CSS_UNITS);
+    this.viewport = this.page.getViewport(this.scale);
   },
 
   mounted() {
