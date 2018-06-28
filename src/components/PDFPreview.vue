@@ -80,6 +80,11 @@ export default {
   right: 0;
   bottom: 0;
 }
+
+.scrolling-page {
+  margin-bottom: 1em;
+}
+
 @media print {
   .pdf-preview {
     display: none;

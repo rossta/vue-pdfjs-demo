@@ -10,9 +10,12 @@
       v-bind="{page, scrollBounds, focusedPage, enablePageJump}"
       @page-jump="onPageJump"
       >
-      <template slot-scope="{isElementVisible, isPageFocused, isElementFocused}">
+      <div
+        class="scrolling-page"
+        slot-scope="{isElementVisible, isPageFocused, isElementFocused}"
+        >
         <slot v-bind="{page, isElementVisible, isPageFocused, isElementFocused}"></slot>
-      </template>
+      </div>
     </ScrollingPage>
   </div>
 </template>

@@ -148,7 +148,7 @@ export default {
 <style scoped>
 .pdf-thumbnail {
   cursor: pointer;
-  margin: 0 auto 1em;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;

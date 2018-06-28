@@ -170,6 +170,11 @@ export default {
   right: 0;
   background: #525f69;
 }
+
+.scrolling-page {
+  margin-bottom: 1em;
+}
+
 @media print {
   .pdf-document {
     position: static;
