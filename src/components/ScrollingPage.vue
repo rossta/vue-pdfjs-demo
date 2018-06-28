@@ -86,7 +86,7 @@ export default {
     this.updateElementBounds();
   },
 
-  render(h ) {
+  render() {
     const {isElementVisible, isPageFocused, isElementFocused} = this;
     return this.$scopedSlots.default({
       isElementVisible,
