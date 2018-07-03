@@ -1,26 +1,5 @@
 <template>
   <div class="pdf-viewer">
-    <header class="pdf-viewer__header box-shadow">
-      <div class="pdf-preview-toggle">
-        <a @click.prevent.stop="togglePreview" class="icon"><PreviewIcon /></a>
-      </div>
-
-      <PDFZoom
-        :scale="scale"
-        @change="updateScale"
-        @fit="updateFit"
-        class="header-item"
-        />
-
-      <PDFPaginator
-        v-model="currentPage"
-        :pageCount="pageCount"
-        class="header-item"
-        />
-
-      <slot name="header"></slot>
-    </header>
-
     <PDFDocumentProxy
       class="pdf-viewer__main"
       :url="url"
@@ -30,20 +9,11 @@
       @document-errored="onDocumentErrored"
       >
 
-      <PDFPreview
-        slot="preview"
-        slot-scope="{pages}"
-        v-show="isPreviewEnabled"
-        class="pdf-viewer__preview"
-        v-bind="{pages, scale, currentPage, pageCount, isPreviewEnabled}"
-        />
-
       <PDFDocument
         class="pdf-viewer__document"
-        :class="{ 'preview-enabled': isPreviewEnabled }"
         slot="document"
         slot-scope="{pages}"
-        v-bind="{pages, scale, fit, currentPage, pageCount, isPreviewEnabled}"
+        v-bind="{pages, scale, fit, currentPage, pageCount}"
         @scale-change="updateScale"
         />
     </PDFDocumentProxy>
@@ -51,13 +21,8 @@
 </template>
 
 <script>
-import PreviewIcon from '../assets/icon-preview.svg';
-
 import PDFDocument from './PDFDocument';
 import PDFDocumentProxy from './PDFDocumentProxy';
-import PDFPaginator from './PDFPaginator';
-import PDFPreview from './PDFPreview';
-import PDFZoom from './PDFZoom';
 
 function floor(value, precision) {
   const multiplier = Math.pow(10, precision || 0);
@@ -70,10 +35,6 @@ export default {
   components: {
     PDFDocument,
     PDFDocumentProxy,
-    PDFPaginator,
-    PDFPreview,
-    PDFZoom,
-    PreviewIcon,
   },
 
   props: {
@@ -86,7 +47,6 @@ export default {
       fit: undefined,
       currentPage: 1,
       pageCount: undefined,
-      isPreviewEnabled: false,
     };
   },
 
@@ -114,10 +74,6 @@ export default {
     updateCurrentPage(pageNumber) {
       this.currentPage = pageNumber;
     },
-
-    togglePreview() {
-      this.isPreviewEnabled = !this.isPreviewEnabled;
-    },
   },
 
   watch: {
@@ -131,46 +87,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 1em;
-  position: relative;
-  z-index: 99;
-}
-.header-item {
-  margin: 0 2.5em;
-}
-
-.pdf-viewer .pdf-viewer__document,
-.pdf-viewer .pdf-viewer__preview {
-  top: 70px;
-}
-
-.pdf-viewer__preview {
-  display: block;
-  width: 15%;
-  right: 85%;
-}
-
-.pdf-viewer__document {
-  top: 70px;
-  width: 100%;
-  left: 0;
-}
-
-.pdf-viewer__document.preview-enabled {
-  width: 85%;
-  left: 15%;
-}
-
-@media print {
-  header {
-    display: none;
-  }
-}
-</style>

@@ -118,9 +118,6 @@ export default {
 
   render(h) {
     return h('div', [
-      this.$scopedSlots.preview({
-        pages: this.pages,
-      }),
       this.$scopedSlots.document({
         pages: this.pages,
       }),

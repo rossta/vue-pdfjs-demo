@@ -1,38 +1,22 @@
 <template>
   <div id="app">
-
-    <PDFViewer
-      v-bind="{url}"
-      @document-errored="onDocumentErrored"
-      >
-      <PDFUploader
-        v-if="enableUploader"
-        :documentError="documentError"
-        @updated="urlUpdated"
-        slot="header"
-        class="header-item"
-        />
-    </PDFViewer>
+    <PDFViewer v-bind="{url}"></PDFViewer>
   </div>
 </template>
 
 <script>
-import PDFUploader from './components/PDFUploader.vue'
 import PDFViewer from './components/PDFViewer.vue'
 
 export default {
   name: 'app',
 
   components: {
-    PDFUploader,
     PDFViewer,
   },
 
   data() {
     return {
       url: process.env.VUE_APP_PDF_URL,
-      documentError: undefined,
-      enableUploader: process.env.VUE_APP_UPLOAD_ENABLED === 'true',
     };
   },
 
@@ -40,9 +24,6 @@ export default {
     urlUpdated(url) {
       this.documentError = undefined;
       this.url = url;
-    },
-    onDocumentErrored(e) {
-      this.documentError = e.text;
     },
   },
 

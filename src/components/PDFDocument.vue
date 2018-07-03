@@ -64,9 +64,6 @@ export default {
       type: Number,
       default: 1,
     },
-    isPreviewEnabled: {
-      default: false,
-    },
   },
 
   computed: {
@@ -154,7 +151,6 @@ export default {
       }
     },
     pageCount: 'fitWidth',
-    isPreviewEnabled: 'fitWidth',
   },
 };
 </script>
@@ -171,6 +167,9 @@ export default {
   background: #525f69;
 }
 
+.scrolling-page:first-child {
+  margin-top: 1em;
+}
 .scrolling-page {
   margin-bottom: 1em;
 }
