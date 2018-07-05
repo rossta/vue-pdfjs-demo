@@ -8,7 +8,6 @@
       @document-rendered="onDocumentRendered"
       @document-errored="onDocumentErrored"
       >
-
       <PDFDocument
         class="pdf-viewer__document"
         slot="document"

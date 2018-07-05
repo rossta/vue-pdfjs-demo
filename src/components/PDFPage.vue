@@ -16,19 +16,22 @@ export default {
       type: Number,
       required: true,
     },
-    isPageFocused: {
-      type: Boolean,
-      default: false,
+    focusedPage: {
+      type: Number,
+      default: undefined,
     },
-    isElementVisible: {
-      type: Boolean,
-      default: false,
-    },
-    isElementFocused: {
-      type: Boolean,
-      default: false,
+    scrollBounds: {
+      type: Object,
+      default: () => ({}),
     },
   },
+
+  data() {
+    return {
+      elementBounds: {},
+    };
+  },
+
 
   computed: {
     actualSizeViewport() {
@@ -58,9 +61,51 @@ export default {
     pageNumber() {
       return this.page.pageNumber;
     },
+
+    isPageFocused() {
+      return this.page.pageNumber === this.focusedPage;
+    },
+
+    isElementFocused() {
+      const {top, bottom, height} = this.elementBounds;
+      if (!height) return;
+
+      const {top: scrollTop, height: clientHeight} = this.scrollBounds;
+      const halfHeight = (height / 2);
+      const halfScreen = (clientHeight / 2);
+      const delta = height >= halfScreen ? halfScreen : halfHeight;
+      const threshold = scrollTop + delta;
+
+      return top < threshold && bottom >= threshold;
+    },
+
+    isElementVisible() {
+      const {top, bottom, height} = this.elementBounds;
+      if (!height) return;
+
+      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
+
+      return top < scrollBottom && bottom > scrollTop;
+    },
   },
 
   methods: {
+    jumpToPage() {
+      if (this.isElementFocused || !this.isPageFocused) return;
+      const {top} = this.elementBounds;
+
+      this.$emit('page-jump', top);
+    },
+
+    updateElementBounds() {
+      const {offsetTop, clientHeight} = this.$el;
+      this.elementBounds = {
+        top: offsetTop,
+        bottom: offsetTop + clientHeight,
+        height: clientHeight,
+      };
+    },
+
     focusPage() {
       if (this.isPageFocused) return;
 
@@ -94,10 +139,6 @@ export default {
         });
     },
 
-    updateVisibility() {
-      this.$parent.$emit('update-visibility');
-    },
-
     destroyPage(page) {
       // PDFPageProxy#_destroy
       // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
@@ -117,7 +158,9 @@ export default {
   },
 
   watch: {
-    scale: 'updateVisibility',
+    scale: 'updateElementBounds',
+    scrollBounds: 'updateElementBounds',
+    isPageFocused: 'jumpToPage',
 
     page(_newPage, oldPage) {
       this.destroyPage(oldPage);
@@ -140,6 +183,7 @@ export default {
 
   mounted() {
     log(`Page ${this.pageNumber} mounted`);
+    this.updateElementBounds();
   },
 
   beforeDestroy() {

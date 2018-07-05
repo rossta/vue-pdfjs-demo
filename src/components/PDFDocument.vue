@@ -1,21 +1,23 @@
 <template>
-  <ScrollingDocument
-    class="pdf-document"
+  <div
+    class="pdf-document scrolling-document"
     v-resize="fitWidth"
-    v-bind="{pages, pageCount, currentPage}"
-    :enable-page-jump="true"
+    v-bottom.immediate="onPagesFetch"
+    v-scroll.immediate="updateScrollBounds"
     @page-jump="onPageJump"
     @pages-fetch="onPagesFetch"
-    @pages-reset="fitWidth"
     >
     <PDFPage
-      slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
-      v-bind="{scale, page, isElementVisible, isPageFocused, isElementFocused}"
+      v-for="page in pages"
+      v-bind="{scale, page, scrollBounds, focusedPage}"
+      :key="page.pageNumber"
+      class="scrolling-page"
+      @page-jump="onPageJump"
       @page-rendered="onPageRendered"
       @page-errored="onPageErrored"
       @page-focus="onPageFocused"
     />
-  </ScrollingDocument>
+  </div>
 </template>
 
 <script>
@@ -29,19 +31,21 @@ const log = debug('app:components/PDFDocument');
 import {PIXEL_RATIO, VIEWPORT_RATIO} from '../utils/constants';
 
 import resize from '../directives/resize';
+import bottom from '../directives/bottom';
+import scroll from '../directives/scroll';
 
-import ScrollingDocument from './ScrollingDocument';
 import PDFPage from './PDFPage';
 
 export default {
   name: 'PDFDocument',
 
   components: {
-    ScrollingDocument,
     PDFPage,
   },
 
   directives: {
+    bottom,
+    scroll,
     resize,
   },
 
@@ -66,6 +70,13 @@ export default {
     },
   },
 
+  data() {
+    return {
+      focusedPage: undefined,
+      scrollBounds: {},
+    };
+  },
+
   computed: {
     defaultViewport() {
       if (!this.pages.length) return {width: 0, height:0};
@@ -78,6 +89,10 @@ export default {
       const {width, height} = this.defaultViewport;
       return width <= height;
     },
+
+    pagesLength() {
+      return this.pages.length;
+    },
   },
 
   methods: {
@@ -88,29 +103,11 @@ export default {
       return ($el.clientWidth * PIXEL_RATIO) * VIEWPORT_RATIO / defaultViewport.width;
     },
 
-    pageHeightScale() {
-      const {defaultViewport, $el} = this;
-      if (!defaultViewport.height) return 0;
-
-      return ($el.clientHeight * PIXEL_RATIO) * VIEWPORT_RATIO / defaultViewport.height;
-    },
     // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
     // and a subjective scale factor based on the screen size.
     fitWidth() {
       const scale = this.pageWidthScale();
       log('fit width scale', scale);
-      this.$emit('scale-change', scale);
-    },
-
-    fitHeight() {
-      const scale = this.isPortrait ? this.pageHeightScale() : this.pageWidthScale();
-      log('fit height scale', scale);
-      this.$emit('scale-change', scale);
-    },
-
-    fitAuto() {
-      const scale = Math.min(this.pageWidthScale(), this.pageHeightScale());
-      log('fit auto scale', scale);
       this.$emit('scale-change', scale);
     },
 
@@ -133,24 +130,36 @@ export default {
     onPageErrored(payload) {
       this.$parent.$emit('page-errored', payload);
     },
+
+    updateScrollBounds() {
+      const {scrollTop, clientHeight} = this.$el;
+      this.scrollBounds = {
+        top: scrollTop,
+        bottom: scrollTop + clientHeight,
+        height: clientHeight,
+      };
+    },
   },
 
   watch: {
-    fit(fit) {
-      switch (fit) {
-        case 'width':
-          this.fitWidth();
-          break;
+    pageCount: 'fitWidth',
 
-        case 'auto':
-          this.fitAuto();
-          break;
+    pagesLength(count, oldCount) {
+      if (oldCount === 0) this.fitWidth();
 
-        default:
-          break;
+      // Set focusedPage after new pages are mounted
+      this.$nextTick(() => {
+        this.focusedPage = this.currentPage;
+      });
+    },
+
+    currentPage(currentPage) {
+      if (currentPage > this.pages.length) {
+        this.fetchPages(currentPage);
+      } else {
+        this.focusedPage = currentPage;
       }
     },
-    pageCount: 'fitWidth',
   },
 };
 </script>
