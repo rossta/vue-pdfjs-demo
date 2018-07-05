@@ -2,10 +2,9 @@
   <div
     class="pdf-document scrolling-document"
     v-resize="fitWidth"
-    v-bottom.immediate="onPagesFetch"
     v-scroll.immediate="updateScrollBounds"
     @page-jump="onPageJump"
-    @pages-fetch="onPagesFetch"
+    @pages-fetch="fetchPages"
     >
     <PDFPage
       v-for="page in pages"
@@ -28,10 +27,11 @@
 import debug from 'debug';
 const log = debug('app:components/PDFDocument');
 
+import throttle from 'lodash/throttle';
+
 import {PIXEL_RATIO, VIEWPORT_RATIO} from '../utils/constants';
 
 import resize from '../directives/resize';
-import bottom from '../directives/bottom';
 import scroll from '../directives/scroll';
 
 import PDFPage from './PDFPage';
@@ -44,7 +44,6 @@ export default {
   },
 
   directives: {
-    bottom,
     scroll,
     resize,
   },
@@ -115,7 +114,7 @@ export default {
       this.$el.scrollTop = scrollTop; // triggers 'scroll' event
     },
 
-    onPagesFetch(currentPage) {
+    fetchPages(currentPage) {
       this.$parent.$emit('pages-fetch', currentPage);
     },
 
@@ -139,6 +138,11 @@ export default {
         height: clientHeight,
       };
     },
+
+    isBottomVisible() {
+      const {scrollTop, clientHeight, scrollHeight} = this.$el;
+      return scrollTop + clientHeight >= scrollHeight;
+    },
   },
 
   watch: {
@@ -160,6 +164,21 @@ export default {
         this.focusedPage = currentPage;
       }
     },
+  },
+
+  mounted() {
+    visibleCallback = () => {
+      if (this.isBottomVisible()) this.fetchPages();
+    }
+    visibleCallback();
+    const throttledCallback = throttle(visibleCallback, 300);
+    this.$el.addEventListener('scroll', throttledCallback, true);
+    window.addEventListener('resize', throttledCallback, true);
+    this.throttledCallback = throttledCallback;
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.throttledCallback, true);
   },
 };
 </script>
