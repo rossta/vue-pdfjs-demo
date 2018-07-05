@@ -1,8 +1,6 @@
 <template>
   <div
     class="pdf-document scrolling-document"
-    v-resize="fitWidth"
-    v-scroll.immediate="updateScrollBounds"
     @page-jump="onPageJump"
     @pages-fetch="fetchPages"
     >
@@ -167,18 +165,16 @@ export default {
   },
 
   mounted() {
-    visibleCallback = () => {
-      if (this.isBottomVisible()) this.fetchPages();
-    }
-    visibleCallback();
-    const throttledCallback = throttle(visibleCallback, 300);
-    this.$el.addEventListener('scroll', throttledCallback, true);
-    window.addEventListener('resize', throttledCallback, true);
-    this.throttledCallback = throttledCallback;
+    this.onBoundaryChange();
+    this.$el.addEventListener('scroll', throttle(this.onBoundaryChange, 300), true);
+
+    const throttledOnResize = throttle(this.onResize, 300);
+    window.addEventListener('resize', throttledOnResize, true);
+    this.throttledOnResize = throttledOnResize;
   },
 
   beforeDestroy() {
-    window.removeEventListener('resize', this.throttledCallback, true);
+    window.removeEventListener('resize', this.throttledOnResize, true);
   },
 };
 </script>
