@@ -25,14 +25,40 @@
 import debug from 'debug';
 const log = debug('app:components/PDFDocument');
 
+import range from 'lodash/range';
 import throttle from 'lodash/throttle';
 
 import {PIXEL_RATIO, VIEWPORT_RATIO} from '../utils/constants';
 
-import resize from '../directives/resize';
-import scroll from '../directives/scroll';
-
 import PDFPage from './PDFPage';
+
+function getDocument(url) {
+  // Using import statement in this way allows Webpack
+  // to treat pdf.js as an async dependency so we can
+  // avoid adding it to one of the main bundles
+  return import(
+    /* webpackChunkName: 'pdfjs-dist' */
+    'pdfjs-dist/webpack').then(pdfjs => pdfjs.getDocument(url));
+}
+
+// pdf: instance of PDFDocumentProxy
+// see docs for PDF.js for more info
+function getPages(pdf, first, last) {
+  const allPages = range(first, last+1).map(number => pdf.getPage(number));
+  return Promise.all(allPages);
+}
+
+const BUFFER_LENGTH = 3;
+
+function getDefaults() {
+  return {
+    pdf: undefined,
+    pages: [],
+    cursor: 0,
+    focusedPage: undefined,
+    scrollBounds: {},
+  };
+}
 
 export default {
   name: 'PDFDocument',
@@ -41,37 +67,23 @@ export default {
     PDFPage,
   },
 
-  directives: {
-    scroll,
-    resize,
-  },
-
   props: {
-    pages: {
-      required: true,
-    },
-    pageCount: {
-      type: Number,
-      default: 0,
-    },
     scale: {
       type: Number,
       default: 1.0,
-    },
-    fit: {
-      type: String,
     },
     currentPage: {
       type: Number,
       default: 1,
     },
+    url: {
+      type: String,
+      required: true,
+    },
   },
 
   data() {
-    return {
-      focusedPage: undefined,
-      scrollBounds: {},
-    };
+    return getDefaults();
   },
 
   computed: {
@@ -87,8 +99,12 @@ export default {
       return width <= height;
     },
 
-    pagesLength() {
+    fetchedPageCount() {
       return this.pages.length;
+    },
+
+    pageCount() {
+      return this.pdf ? this.pdf.numPages : 0;
     },
   },
 
@@ -112,20 +128,16 @@ export default {
       this.$el.scrollTop = scrollTop; // triggers 'scroll' event
     },
 
-    fetchPages(currentPage) {
-      this.$parent.$emit('pages-fetch', currentPage);
-    },
-
     onPageFocused(pageNumber) {
-      this.$parent.$emit('page-focus', pageNumber);
+      this.$emit('page-focus', pageNumber);
     },
 
-    onPageRendered(payload) {
-      this.$parent.$emit('page-rendered', payload);
+    onPageRendered({text, page}) {
+      log(text, page);
     },
 
-    onPageErrored(payload) {
-      this.$parent.$emit('page-errored', payload);
+    onPageErrored({text, response, page}) {
+      log('Error!', text, response, page);
     },
 
     updateScrollBounds() {
@@ -141,12 +153,46 @@ export default {
       const {scrollTop, clientHeight, scrollHeight} = this.$el;
       return scrollTop + clientHeight >= scrollHeight;
     },
+
+    onBoundaryChange() {
+      if (this.isBottomVisible()) this.fetchPages();
+      this.updateScrollBounds();
+    },
+
+    onResize() {
+      this.fitWidth();
+      this.onBoundaryChange();
+    },
+
+    fetchPages(currentPage = 0) {
+      if (!this.pdf) return;
+      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
+
+      const startIndex = this.pages.length;
+      if (this.cursor > startIndex) return;
+
+      const startPage = startIndex + 1;
+      const endPage = Math.min(Math.max(currentPage, startIndex + BUFFER_LENGTH), this.pageCount);
+      this.cursor = endPage;
+
+      log(`Fetching pages ${startPage} to ${endPage}`);
+      getPages(this.pdf, startPage, endPage)
+        .then((pages) => {
+          const deleteCount = 0;
+          this.pages.splice(startIndex, deleteCount, ...pages);
+          return this.pages;
+        })
+        .catch((response) => {
+          this.$emit('document-errored', {text: 'Failed to retrieve pages', response});
+          log('Failed to retrieve pages', response);
+        });
+    },
   },
 
   watch: {
     pageCount: 'fitWidth',
 
-    pagesLength(count, oldCount) {
+    fetchedPageCount(count, oldCount) {
       if (oldCount === 0) this.fitWidth();
 
       // Set focusedPage after new pages are mounted
@@ -161,6 +207,26 @@ export default {
       } else {
         this.focusedPage = currentPage;
       }
+    },
+
+    url: {
+      handler(url) {
+        getDocument(url)
+          .then(pdf => (this.pdf = pdf))
+          .catch(response => {
+            this.$emit('document-errored', {text: 'Failed to retrieve PDF', response});
+            log('Failed to retrieve PDF', response);
+          });
+      },
+      immediate: true,
+    },
+
+    pdf(pdf, oldPdf) {
+      if (!pdf) return;
+      if (oldPdf) Object.assign(this, getDefaults());
+
+      this.$emit('page-count', this.pageCount);
+      this.fetchPages();
     },
   },
 

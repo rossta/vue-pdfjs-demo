@@ -1,27 +1,20 @@
 <template>
   <div class="pdf-viewer">
-    <PDFDocumentProxy
-      class="pdf-viewer__main"
-      :url="url"
+    <PDFDocument
+      class="pdf-document"
+      slot="document"
+      v-bind="{url, scale, currentPage, pageCount}"
+      @scale-change="updateScale"
       @page-count="updatePageCount"
       @page-focus="updateCurrentPage"
       @document-rendered="onDocumentRendered"
       @document-errored="onDocumentErrored"
-      >
-      <PDFDocument
-        class="pdf-viewer__document"
-        slot="document"
-        slot-scope="{pages}"
-        v-bind="{pages, scale, fit, currentPage, pageCount}"
-        @scale-change="updateScale"
-        />
-    </PDFDocumentProxy>
+      />
   </div>
 </template>
 
 <script>
 import PDFDocument from './PDFDocument';
-import PDFDocumentProxy from './PDFDocumentProxy';
 
 function floor(value, precision) {
   const multiplier = Math.pow(10, precision || 0);
@@ -33,7 +26,6 @@ export default {
 
   components: {
     PDFDocument,
-    PDFDocumentProxy,
   },
 
   props: {
