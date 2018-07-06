@@ -6,7 +6,7 @@
     >
     <PDFPage
       v-for="page in pages"
-      v-bind="{scale, page, scrollBounds, focusedPage}"
+      v-bind="{scale, page, scrollTop, scrollHeight, focusedPage}"
       :key="page.pageNumber"
       class="scrolling-page"
       @page-jump="onPageJump"
@@ -56,7 +56,8 @@ function getDefaults() {
     pages: [],
     cursor: 0,
     focusedPage: undefined,
-    scrollBounds: {},
+    scrollTop: 0,
+    scrollHeight: 0,
   };
 }
 
@@ -142,11 +143,8 @@ export default {
 
     updateScrollBounds() {
       const {scrollTop, clientHeight} = this.$el;
-      this.scrollBounds = {
-        top: scrollTop,
-        bottom: scrollTop + clientHeight,
-        height: clientHeight,
-      };
+      this.scrollTop = scrollTop;
+      this.scrollHeight = clientHeight;
     },
 
     isBottomVisible() {
