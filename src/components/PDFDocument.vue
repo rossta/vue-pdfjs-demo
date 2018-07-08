@@ -10,7 +10,7 @@
     >
     <PDFPage
       slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
-      v-bind="{scale, page, isElementVisible, isPageFocused, isElementFocused}"
+      v-bind="{scale, optimalScale, page, isElementVisible, isPageFocused, isElementFocused}"
       @page-rendered="onPageRendered"
       @page-errored="onPageErrored"
       @page-focus="onPageFocused"
@@ -57,6 +57,9 @@ export default {
       type: Number,
       default: 1.0,
     },
+    optimalScale: {
+      type: Number,
+    },
     fit: {
       type: String,
     },
@@ -101,20 +104,22 @@ export default {
     // and a subjective scale factor based on the screen size.
     fitWidth() {
       const scale = this.pageWidthScale();
-      log('fit width scale', scale);
-      this.$emit('scale-change', scale);
+      this.updateScale(scale, {isOptimal: !this.optimalScale});
     },
 
     fitHeight() {
       const scale = this.isPortrait ? this.pageHeightScale() : this.pageWidthScale();
-      log('fit height scale', scale);
-      this.$emit('scale-change', scale);
+      this.updateScale(scale);
     },
 
     fitAuto() {
       const scale = Math.min(this.pageWidthScale(), this.pageHeightScale());
-      log('fit auto scale', scale);
-      this.$emit('scale-change', scale);
+      this.updateScale(scale);
+    },
+
+    updateScale(scale, {isOptimal = false} = {}) {
+      if (!scale) return;
+      this.$emit('scale-change', {scale, isOptimal});
     },
 
     onPageJump(scrollTop) {

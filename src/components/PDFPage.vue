@@ -16,6 +16,10 @@ export default {
       type: Number,
       required: true,
     },
+    optimalScale: {
+      type: Number,
+      required: true,
+    },
     isPageFocused: {
       type: Boolean,
       default: false,
@@ -135,7 +139,7 @@ export default {
   created() {
     // PDFPageProxy#getViewport
     // https://mozilla.github.io/pdf.js/api/draft/PDFPageProxy.html
-    this.viewport = this.page.getViewport(this.scale);
+    this.viewport = this.page.getViewport(this.optimalScale);
   },
 
   mounted() {

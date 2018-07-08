@@ -43,7 +43,7 @@
         :class="{ 'preview-enabled': isPreviewEnabled }"
         slot="document"
         slot-scope="{pages}"
-        v-bind="{pages, scale, fit, currentPage, pageCount, isPreviewEnabled}"
+        v-bind="{pages, scale, optimalScale, fit, currentPage, pageCount, isPreviewEnabled}"
         @scale-change="updateScale"
         />
     </PDFDocumentProxy>
@@ -83,6 +83,7 @@ export default {
   data() {
     return {
       scale: undefined,
+      optimalScale: undefined,
       fit: undefined,
       currentPage: 1,
       pageCount: undefined,
@@ -99,8 +100,10 @@ export default {
       this.$emit('document-errored', e);
     },
 
-    updateScale(scale) {
-      this.scale = floor(scale, 2);
+    updateScale({scale, isOptimal = false}) {
+      const roundedScale = floor(scale, 2);
+      if (isOptimal) this.optimalScale = roundedScale;
+      this.scale = roundedScale;
     },
 
     updateFit(fit) {
