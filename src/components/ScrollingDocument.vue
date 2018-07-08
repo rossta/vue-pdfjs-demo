@@ -7,7 +7,7 @@
     <ScrollingPage
       v-for="page in pages"
       :key="page.pageNumber"
-      v-bind="{page, scrollHeight, scrollTop, focusedPage, enablePageJump}"
+      v-bind="{page, clientHeight, scrollTop, focusedPage, enablePageJump}"
       @page-jump="onPageJump"
       >
       <div
@@ -57,7 +57,7 @@ export default {
     return {
       focusedPage: undefined,
       scrollTop: 0,
-      scrollHeight: 0,
+      clientHeight: 0,
     };
   },
 
@@ -79,7 +79,7 @@ export default {
     updateScrollBounds() {
       const {scrollTop, clientHeight} = this.$el;
       this.scrollTop = scrollTop;
-      this.scrollHeight = clientHeight;
+      this.clientHeight = clientHeight;
     },
   },
 

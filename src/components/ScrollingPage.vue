@@ -15,7 +15,7 @@ export default {
       type: Number,
       default: 0,
     },
-    scrollHeight: {
+    clientHeight: {
       type: Number,
       default: 0
     },
@@ -27,8 +27,8 @@ export default {
 
   data() {
     return {
-      top: 0,
-      height: 0,
+      elementTop: 0,
+      elementHeight: 0,
     };
   },
 
@@ -38,30 +38,30 @@ export default {
     },
 
     isElementFocused() {
-      const {top, bottom, height, scrollTop, scrollHeight} = this;
-      if (!height) return;
+      const {elementTop, bottom, elementHeight, scrollTop, clientHeight} = this;
+      if (!elementHeight) return;
 
-      const halfHeight = (height / 2);
-      const halfScreen = (scrollHeight / 2);
-      const delta = height >= halfScreen ? halfScreen : halfHeight;
+      const halfHeight = (elementHeight / 2);
+      const halfScreen = (clientHeight / 2);
+      const delta = elementHeight >= halfScreen ? halfScreen : halfHeight;
       const threshold = scrollTop + delta;
 
-      return top < threshold && bottom >= threshold;
+      return elementTop < threshold && bottom >= threshold;
     },
 
     isElementVisible() {
-      const {top, bottom, height, scrollTop, scrollBottom} = this;
-      if (!height) return;
+      const {elementTop, bottom, elementHeight, scrollTop, scrollBottom} = this;
+      if (!elementHeight) return;
 
-      return top < scrollBottom && bottom > scrollTop;
+      return elementTop < scrollBottom && bottom > scrollTop;
     },
 
     bottom() {
-      return this.top + this.height;
+      return this.elementTop + this.elementHeight;
     },
 
     scrollBottom() {
-      return this.scrollTop + this.scrollHeight;
+      return this.scrollTop + this.clientHeight;
     },
   },
 
@@ -69,19 +69,19 @@ export default {
     jumpToPage() {
       if (!this.enablePageJump || this.isElementFocused || !this.isPageFocused) return;
 
-      this.$emit('page-jump', this.top);
+      this.$emit('page-jump', this.elementTop);
     },
 
     updateElementBounds() {
       const {offsetTop, offsetHeight} = this.$el;
-      this.top = offsetTop;
-      this.height = offsetHeight;
+      this.elementTop = offsetTop;
+      this.elementHeight = offsetHeight;
     },
   },
 
   watch: {
     scrollTop: 'updateElementBounds',
-    scrollHeight: 'updateElementBounds',
+    clientHeight: 'updateElementBounds',
     isPageFocused: 'jumpToPage',
   },
 
