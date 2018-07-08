@@ -16,15 +16,11 @@ export default {
       type: Number,
       required: true,
     },
-    focusedPage: {
-      type: Number,
-      default: undefined,
-    },
     scrollTop: {
       type: Number,
       default: 0
     },
-    scrollHeight: {
+    clientHeight: {
       type: Number,
       default: 0
     },
@@ -67,22 +63,6 @@ export default {
       return this.page.pageNumber;
     },
 
-    isPageFocused() {
-      return this.page.pageNumber === this.focusedPage;
-    },
-
-    isElementFocused() {
-      const {elementTop, elementBottom, elementHeight, scrollTop, scrollHeight} = this;
-      if (!elementHeight) return;
-
-      const halfHeight = (elementHeight / 2);
-      const halfScreen = (scrollHeight / 2);
-      const delta = elementHeight >= halfScreen ? halfScreen : halfHeight;
-      const threshold = scrollTop + delta;
-
-      return elementTop < threshold && elementBottom >= threshold;
-    },
-
     isElementVisible() {
       const {elementTop, elementBottom, scrollTop, scrollBottom} = this;
       if (!elementBottom) return;
@@ -95,28 +75,15 @@ export default {
     },
 
     scrollBottom() {
-      return this.scrollTop + this.scrollHeight;
+      return this.scrollTop + this.clientHeight;
     },
   },
 
   methods: {
-    jumpToPage() {
-      if (this.isElementFocused || !this.isPageFocused) return;
-      const {elementTop} = this;
-
-      this.$emit('page-jump', elementTop);
-    },
-
     updateElementBounds() {
       const {offsetTop, offsetHeight} = this.$el;
       this.elementTop = offsetTop;
       this.elementHeight = offsetHeight;
-    },
-
-    focusPage() {
-      if (this.isPageFocused) return;
-
-      this.$emit('page-focus', this.pageNumber);
     },
 
     drawPage() {
@@ -166,15 +133,11 @@ export default {
 
   watch: {
     scale: 'updateElementBounds',
-    scrollBounds: 'updateElementBounds',
-    isPageFocused: 'jumpToPage',
+    scrollTop: 'updateElementBounds',
+    clientHeight: 'updateElementBounds',
 
     page(_newPage, oldPage) {
       this.destroyPage(oldPage);
-    },
-
-    isElementFocused(isElementFocused) {
-      if (isElementFocused) this.focusPage();
     },
 
     isElementVisible(isElementVisible) {

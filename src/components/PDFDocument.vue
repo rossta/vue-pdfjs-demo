@@ -1,18 +1,14 @@
 <template>
   <div
     class="pdf-document scrolling-document"
-    @page-jump="onPageJump"
-    @pages-fetch="fetchPages"
     >
     <PDFPage
       v-for="page in pages"
-      v-bind="{scale, page, scrollTop, scrollHeight, focusedPage}"
+      v-bind="{scale, page, scrollTop, clientHeight}"
       :key="page.pageNumber"
       class="scrolling-page"
-      @page-jump="onPageJump"
       @page-rendered="onPageRendered"
       @page-errored="onPageErrored"
-      @page-focus="onPageFocused"
     />
   </div>
 </template>
@@ -55,9 +51,9 @@ function getDefaults() {
     pdf: undefined,
     pages: [],
     cursor: 0,
-    focusedPage: undefined,
     scrollTop: 0,
-    scrollHeight: 0,
+    clientHeight: 0,
+    didReachBottom: false,
   };
 }
 
@@ -73,10 +69,6 @@ export default {
       type: Number,
       default: 1.0,
     },
-    currentPage: {
-      type: Number,
-      default: 1,
-    },
     url: {
       type: String,
       required: true,
@@ -89,7 +81,7 @@ export default {
 
   computed: {
     defaultViewport() {
-      if (!this.pages.length) return {width: 0, height:0};
+      if (!this.fetchedPageCount) return {width: 0, height:0};
       const [page] = this.pages;
 
       return page.getViewport(1.0);
@@ -125,14 +117,6 @@ export default {
       this.$emit('scale-change', scale);
     },
 
-    onPageJump(scrollTop) {
-      this.$el.scrollTop = scrollTop; // triggers 'scroll' event
-    },
-
-    onPageFocused(pageNumber) {
-      this.$emit('page-focus', pageNumber);
-    },
-
     onPageRendered({text, page}) {
       log(text, page);
     },
@@ -144,7 +128,8 @@ export default {
     updateScrollBounds() {
       const {scrollTop, clientHeight} = this.$el;
       this.scrollTop = scrollTop;
-      this.scrollHeight = clientHeight;
+      this.clientHeight = clientHeight;
+      this.didReachBottom = this.isBottomVisible();
     },
 
     isBottomVisible() {
@@ -152,32 +137,27 @@ export default {
       return scrollTop + clientHeight >= scrollHeight;
     },
 
-    onBoundaryChange() {
-      if (this.isBottomVisible()) this.fetchPages();
+    onResize() {
+      this.fitWidth();
       this.updateScrollBounds();
     },
 
-    onResize() {
-      this.fitWidth();
-      this.onBoundaryChange();
-    },
-
-    fetchPages(currentPage = 0) {
+    fetchPages() {
       if (!this.pdf) return;
-      if (this.pageCount > 0 && this.pages.length === this.pageCount) return;
+      if (this.pageCount > 0 && this.fetchedPageCount === this.pageCount) return;
 
-      const startIndex = this.pages.length;
-      if (this.cursor > startIndex) return;
+      const previousPage = this.fetchedPageCount;
+      if (this.cursor > previousPage) return;
 
-      const startPage = startIndex + 1;
-      const endPage = Math.min(Math.max(currentPage, startIndex + BUFFER_LENGTH), this.pageCount);
+      const startPage = previousPage + 1;
+      const endPage = Math.min(previousPage + BUFFER_LENGTH, this.pageCount);
       this.cursor = endPage;
 
       log(`Fetching pages ${startPage} to ${endPage}`);
       getPages(this.pdf, startPage, endPage)
         .then((pages) => {
           const deleteCount = 0;
-          this.pages.splice(startIndex, deleteCount, ...pages);
+          this.pages.splice(previousPage, deleteCount, ...pages);
           return this.pages;
         })
         .catch((response) => {
@@ -192,19 +172,6 @@ export default {
 
     fetchedPageCount(count, oldCount) {
       if (oldCount === 0) this.fitWidth();
-
-      // Set focusedPage after new pages are mounted
-      this.$nextTick(() => {
-        this.focusedPage = this.currentPage;
-      });
-    },
-
-    currentPage(currentPage) {
-      if (currentPage > this.pages.length) {
-        this.fetchPages(currentPage);
-      } else {
-        this.focusedPage = currentPage;
-      }
     },
 
     url: {
@@ -223,14 +190,17 @@ export default {
       if (!pdf) return;
       if (oldPdf) Object.assign(this, getDefaults());
 
-      this.$emit('page-count', this.pageCount);
       this.fetchPages();
+    },
+
+    didReachBottom(didReachBottom) {
+      if (didReachBottom) this.fetchPages();
     },
   },
 
   mounted() {
-    this.onBoundaryChange();
-    this.$el.addEventListener('scroll', throttle(this.onBoundaryChange, 300), true);
+    this.updateScrollBounds();
+    this.$el.addEventListener('scroll', throttle(this.updateScrollBounds, 300), true);
 
     const throttledOnResize = throttle(this.onResize, 300);
     window.addEventListener('resize', throttledOnResize, true);
