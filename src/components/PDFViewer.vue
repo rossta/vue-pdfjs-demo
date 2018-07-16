@@ -1,6 +1,6 @@
 <template>
   <div class="pdf-viewer">
-    <PDFDocumentProxy
+    <PDFData
       class="pdf-viewer__main"
       :url="url"
       @page-count="updatePageCount"
@@ -9,20 +9,28 @@
       @document-errored="onDocumentErrored"
       >
 
+      <PDFPreview
+        class="pdf-viewer__preview"
+        slot="preview"
+        slot-scope="{pages}"
+        v-bind="{pages, scale, currentPage, pageCount}"
+        />
+
       <PDFDocument
         class="pdf-viewer__document"
         slot="document"
         slot-scope="{pages}"
-        v-bind="{pages, scale, fit, currentPage, pageCount}"
+        v-bind="{pages, scale, currentPage, pageCount}"
         @scale-change="updateScale"
         />
-    </PDFDocumentProxy>
+    </PDFData>
   </div>
 </template>
 
 <script>
 import PDFDocument from './PDFDocument';
-import PDFDocumentProxy from './PDFDocumentProxy';
+import PDFPreview from './PDFPreview';
+import PDFData from './PDFData';
 
 function floor(value, precision) {
   const multiplier = Math.pow(10, precision || 0);
@@ -34,7 +42,8 @@ export default {
 
   components: {
     PDFDocument,
-    PDFDocumentProxy,
+    PDFPreview,
+    PDFData,
   },
 
   props: {
@@ -44,7 +53,6 @@ export default {
   data() {
     return {
       scale: undefined,
-      fit: undefined,
       currentPage: 1,
       pageCount: undefined,
     };
@@ -61,10 +69,6 @@ export default {
 
     updateScale(scale) {
       this.scale = floor(scale, 2);
-    },
-
-    updateFit(fit) {
-      this.fit = fit;
     },
 
     updatePageCount(pageCount) {
@@ -87,3 +91,13 @@ export default {
   },
 };
 </script>
+<style scoped>
+.pdf-viewer__preview {
+  width: 15%;
+  right: 85%;
+}
+.pdf-viewer__document {
+  width: 85%;
+  left: 15%;
+}
+</style>

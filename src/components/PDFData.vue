@@ -4,7 +4,7 @@
 // rendering of selected pages (but could be easily
 // updated to do so).
 import debug from 'debug';
-const log = debug('app:components/PDFDocumentProxy');
+const log = debug('app:components/PDFData');
 
 import range from 'lodash/range';
 
@@ -17,7 +17,7 @@ function getDocument(url) {
     'pdfjs-dist/webpack').then(pdfjs => pdfjs.getDocument(url));
 }
 
-// pdf: instance of PDFDocumentProxy
+// pdf: instance of PDFData
 // see docs for PDF.js for more info
 function getPages(pdf, first, last) {
   const allPages = range(first, last+1).map(number => pdf.getPage(number));
@@ -33,7 +33,7 @@ function getDefaults() {
 }
 
 export default {
-  name: 'PDFDocumentProxy',
+  name: 'PDFData',
 
   props: {
     url: {
@@ -118,6 +118,9 @@ export default {
 
   render(h) {
     return h('div', [
+      this.$scopedSlots.preview({
+        pages: this.pages,
+      }),
       this.$scopedSlots.document({
         pages: this.pages,
       }),
