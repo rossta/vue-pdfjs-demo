@@ -68,9 +68,8 @@ export default {
   methods: {
     jumpToPage() {
       if (!this.enablePageJump || this.isElementFocused || !this.isPageFocused) return;
-      const {top} = this.elementBounds;
 
-      this.$emit('page-jump', top);
+      this.$emit('page-jump', this.elementTop);
     },
 
     updateElementBounds() {

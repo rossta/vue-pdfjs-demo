@@ -5,8 +5,8 @@
     v-bind="{pages, pageCount, currentPage}"
     >
     <PDFThumbnail
-      slot-scope="{page, isElementVisible}"
-      v-bind="{scale, page, isElementVisible}"
+      slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
+      v-bind="{scale, page, isElementVisible, isPageFocused, isElementFocused}"
       @thumbnail-rendered="onThumbnailRendered"
       @thumbnail-errored="onThumbnailErrored"
       @page-focus="onPageFocused"

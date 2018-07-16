@@ -1,6 +1,7 @@
 <template>
   <div
     @click="focusPage"
+    :class="{ focused: isPageFocused }"
     class="pdf-thumbnail"
     >
     <img
@@ -34,6 +35,10 @@ export default {
     },
     scale: {
       required: true,
+    },
+    isPageFocused: {
+      type: Boolean,
+      default: false,
     },
     isElementVisible: {
       type: Boolean,
