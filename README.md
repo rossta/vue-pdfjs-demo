@@ -4,7 +4,9 @@ This project demonstrates how a simple PDF viewer could be implemented using Vue
 
 [![https://rossta.net/vue-pdfjs-demo](./screenshot-pdf-viewer.png)](https://rossta.net/vue-pdfjs-demo)
 
-To learn more, checkout the article describing how this project was implemented.
+To learn more, checkout [the series of posts](https://rossta.net/blog/series/pdf-viewer.html) describing how this project was implemented.
+1. [Basic page rendering](https://rossta.net/blog/building-a-pdf-viewer-with-vue-part-1.html)
+1. [Fetching and rendering lazily](https://rossta.net/blog/building-a-pdf-viewer-with-vue-part-2.html)
 
 ## Setup
 
