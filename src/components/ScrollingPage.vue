@@ -11,9 +11,13 @@ export default {
       type: Number,
       default: undefined,
     },
-    scrollBounds: {
-      type: Object,
-      default: () => ({}),
+    scrollTop: {
+      type: Number,
+      default: 0
+    },
+    clientHeight: {
+      type: Number,
+      default: 0
     },
     enablePageJump: {
       type: Boolean,
@@ -23,7 +27,8 @@ export default {
 
   data() {
     return {
-      elementBounds: {},
+      elementTop: 0,
+      elementHeight: 0,
     };
   },
 
@@ -33,25 +38,30 @@ export default {
     },
 
     isElementFocused() {
-      const {top, bottom, height} = this.elementBounds;
-      if (!height) return;
+      const {elementTop, elementBottom, elementHeight, scrollTop, clientHeight} = this;
+      if (!elementHeight) return;
 
-      const {top: scrollTop, height: clientHeight} = this.scrollBounds;
-      const halfHeight = (height / 2);
+      const halfHeight = (elementHeight / 2);
       const halfScreen = (clientHeight / 2);
-      const delta = height >= halfScreen ? halfScreen : halfHeight;
+      const delta = elementHeight >= halfScreen ? halfScreen : halfHeight;
       const threshold = scrollTop + delta;
 
-      return top < threshold && bottom >= threshold;
+      return elementTop < threshold && elementBottom >= threshold;
     },
 
     isElementVisible() {
-      const {top, bottom, height} = this.elementBounds;
-      if (!height) return;
+      const {elementTop, elementBottom, scrollTop, scrollBottom} = this;
+      if (!elementBottom) return;
 
-      const {top: scrollTop, bottom: scrollBottom} = this.scrollBounds;
+      return elementTop < scrollBottom && elementBottom > scrollTop;
+    },
 
-      return top < scrollBottom && bottom > scrollTop;
+    elementBottom() {
+      return this.elementTop + this.elementHeight;
+    },
+
+    scrollBottom() {
+      return this.scrollTop + this.clientHeight;
     },
   },
 
@@ -64,17 +74,16 @@ export default {
     },
 
     updateElementBounds() {
-      const {offsetTop, clientHeight} = this.$el;
-      this.elementBounds = {
-        top: offsetTop,
-        bottom: offsetTop + clientHeight,
-        height: clientHeight,
-      };
+      const {offsetTop, offsetHeight} = this.$el;
+      this.elementTop = offsetTop;
+      this.elementHeight = offsetHeight;
     },
   },
 
   watch: {
-    scrollBounds: 'updateElementBounds',
+    scale: 'updateElementBounds',
+    scrollTop: 'updateElementBounds',
+    clientHeight: 'updateElementBounds',
     isPageFocused: 'jumpToPage',
   },
 

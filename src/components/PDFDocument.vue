@@ -1,7 +1,6 @@
 <template>
   <ScrollingDocument
     class="pdf-document"
-    v-resize="fitWidth"
     v-bind="{pages, pageCount, currentPage}"
     :enable-page-jump="true"
     @page-jump="onPageJump"
@@ -39,10 +38,6 @@ export default {
   components: {
     ScrollingDocument,
     PDFPage,
-  },
-
-  directives: {
-    resize,
   },
 
   props: {

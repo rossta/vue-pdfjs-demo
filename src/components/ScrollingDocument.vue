@@ -1,13 +1,9 @@
 <template>
-  <div
-    class="scrolling-document"
-    v-bottom.immediate="fetchPages"
-    v-scroll.immediate="updateScrollBounds"
-    >
+  <div class="scrolling-document">
     <ScrollingPage
       v-for="page in pages"
       :key="page.pageNumber"
-      v-bind="{page, scrollBounds, focusedPage, enablePageJump}"
+      v-bind="{page, scrollTop, clientHeight, focusedPage, enablePageJump}"
       @page-jump="onPageJump"
       >
       <div
@@ -21,19 +17,13 @@
 </template>
 
 <script>
-import bottom from '../directives/bottom';
-import scroll from '../directives/scroll';
+import throttle from 'lodash/throttle';
 
 import ScrollingPage from './ScrollingPage';
 
 export default {
   components: {
     ScrollingPage,
-  },
-
-  directives: {
-    bottom,
-    scroll,
   },
 
   props: {
@@ -56,7 +46,9 @@ export default {
   data() {
     return {
       focusedPage: undefined,
-      scrollBounds: {},
+      scrollTop: 0,
+      clientHeight: 0,
+      didReachBottom: false,
     };
   },
 
@@ -75,18 +67,47 @@ export default {
       this.$emit('page-jump', scrollTop);
     },
 
+    pageWidthScale() {
+      const {defaultViewport, $el} = this;
+      if (!defaultViewport.width) return 0;
+
+      return ($el.clientWidth * PIXEL_RATIO) * VIEWPORT_RATIO / defaultViewport.width;
+    },
+
+    // Determine an ideal scale using viewport of document's first page, the pixel ratio from the browser
+    // and a subjective scale factor based on the screen size.
+    fitWidth() {
+      const scale = this.pageWidthScale();
+      log('fit width scale', scale);
+      this.$emit('scale-change', scale);
+    },
+
     updateScrollBounds() {
       const {scrollTop, clientHeight} = this.$el;
-      this.scrollBounds = {
-        top: scrollTop,
-        bottom: scrollTop + clientHeight,
-        height: clientHeight,
-      };
+      this.scrollTop = scrollTop;
+      this.clientHeight = clientHeight;
+      this.didReachBottom = this.isBottomVisible();
+    },
+
+    isBottomVisible() {
+      const {scrollTop, clientHeight, scrollHeight} = this.$el;
+      return scrollTop + clientHeight >= scrollHeight;
+    },
+
+    onResize() {
+      this.fitWidth();
+      this.updateScrollBounds();
     },
   },
 
   watch: {
     isParentVisible: 'updateScrollBounds',
+
+    pageCount: 'fitWidth',
+
+    fetchedPageCount(count, oldCount) {
+      if (oldCount === 0) this.fitWidth();
+    },
 
     pagesLength(count, oldCount) {
       if (oldCount === 0) this.$emit('pages-reset');
@@ -104,6 +125,23 @@ export default {
         this.focusedPage = currentPage;
       }
     },
+
+    didReachBottom(didReachBottom) {
+      if (didReachBottom) this.fetchPages();
+    },
+  },
+
+  mounted() {
+    this.updateScrollBounds();
+    this.$el.addEventListener('scroll', throttle(this.updateScrollBounds, 300), true);
+
+    const throttledOnResize = throttle(this.onResize, 300);
+    window.addEventListener('resize', throttledOnResize, true);
+    this.throttledOnResize = throttledOnResize;
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.throttledOnResize, true);
   },
 }
 </script>
