@@ -23,9 +23,6 @@
 // PDF.js and <canvas>. Currently does not support,
 // rendering of selected pages (but could be easily
 // updated to do so).
-import debug from 'debug';
-const log = debug('app:components/PDFDocument');
-
 import {PIXEL_RATIO, VIEWPORT_RATIO} from '../utils/constants';
 
 import resize from '../directives/resize';

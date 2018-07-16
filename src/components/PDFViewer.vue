@@ -21,7 +21,7 @@
       <slot name="header"></slot>
     </header>
 
-    <PDFDocumentProxy
+    <PDFData
       class="pdf-viewer__main"
       :url="url"
       @page-count="updatePageCount"
@@ -46,7 +46,7 @@
         v-bind="{pages, scale, optimalScale, fit, currentPage, pageCount, isPreviewEnabled}"
         @scale-change="updateScale"
         />
-    </PDFDocumentProxy>
+    </PDFData>
   </div>
 </template>
 
@@ -54,7 +54,7 @@
 import PreviewIcon from '../assets/icon-preview.svg';
 
 import PDFDocument from './PDFDocument';
-import PDFDocumentProxy from './PDFDocumentProxy';
+import PDFData from './PDFData';
 import PDFPaginator from './PDFPaginator';
 import PDFPreview from './PDFPreview';
 import PDFZoom from './PDFZoom';
@@ -69,7 +69,7 @@ export default {
 
   components: {
     PDFDocument,
-    PDFDocumentProxy,
+    PDFData,
     PDFPaginator,
     PDFPreview,
     PDFZoom,
