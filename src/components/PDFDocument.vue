@@ -27,8 +27,6 @@ const log = debug('app:components/PDFDocument');
 
 import {PIXEL_RATIO, VIEWPORT_RATIO} from '../utils/constants';
 
-import resize from '../directives/resize';
-
 import ScrollingDocument from './ScrollingDocument';
 import PDFPage from './PDFPage';
 

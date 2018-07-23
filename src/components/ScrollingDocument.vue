@@ -19,6 +19,7 @@
 <script>
 import throttle from 'lodash/throttle';
 
+import {VIEWPORT_RATIO, PIXEL_RATIO} from '../utils/constants';
 import ScrollingPage from './ScrollingPage';
 
 export default {
@@ -78,7 +79,6 @@ export default {
     // and a subjective scale factor based on the screen size.
     fitWidth() {
       const scale = this.pageWidthScale();
-      log('fit width scale', scale);
       this.$emit('scale-change', scale);
     },
 
