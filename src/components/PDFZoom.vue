@@ -41,12 +41,16 @@ export default {
 
   methods: {
     zoomIn() {
-      this.$emit('change', this.scale + this.increment);
+      this.updateScale(this.scale + this.increment);
     },
 
     zoomOut() {
       if (this.scale <= this.increment) return;
-      this.$emit('change', this.scale - this.increment);
+      this.updateScale(this.scale - this.increment);
+    },
+
+    updateScale(scale) {
+      this.$emit('change', {scale});
     },
 
     fitWidth() {
