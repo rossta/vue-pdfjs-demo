@@ -16,8 +16,8 @@ To run the project locally:
 ```
 $ git clone https://github.com/rossta/vue-pdfjs-demo
 $ cd vue-pdfjs-demo
-$ yarn install # or npm install
-$ yarn serve   # or npm serve
+$ yarn install
+$ yarn serve
 ```
 
 ## Documentation
