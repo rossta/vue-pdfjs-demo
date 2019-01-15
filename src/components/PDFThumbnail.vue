@@ -1,7 +1,7 @@
 <template>
   <div
     @click="focusPage"
-    v-visible="drawPage"
+    v-visible.once="drawPage"
     :class="{ focused: isPageFocused }"
     class="pdf-thumbnail"
     >

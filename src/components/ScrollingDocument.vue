@@ -1,7 +1,6 @@
 <template>
   <div
     class="scrolling-document"
-    v-bottom.immediate="fetchPages"
     v-scroll.immediate="updateScrollBounds"
     >
     <ScrollingPage
@@ -17,12 +16,14 @@
         <slot v-bind="{page, isPageFocused, isElementFocused}"></slot>
       </div>
     </ScrollingPage>
+
+    <div v-visible="fetchPages" class="observer"></div>
   </div>
 </template>
 
 <script>
-import bottom from '../directives/bottom';
 import scroll from '../directives/scroll';
+import visible from '../directives/visible';
 
 import ScrollingPage from './ScrollingPage';
 
@@ -32,7 +33,7 @@ export default {
   },
 
   directives: {
-    bottom,
+    visible,
     scroll,
   },
 

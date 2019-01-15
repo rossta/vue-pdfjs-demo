@@ -1,5 +1,5 @@
 <template>
-  <canvas v-visible="drawPage" v-bind="canvasAttrs"></canvas>
+  <canvas v-visible.once="drawPage" v-bind="canvasAttrs"></canvas>
 </template>
 
 <script>
