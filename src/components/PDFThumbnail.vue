@@ -1,6 +1,7 @@
 <template>
   <div
     @click="focusPage"
+    v-visible="drawPage"
     :class="{ focused: isPageFocused }"
     class="pdf-thumbnail"
     >
@@ -25,6 +26,8 @@
 import debug from 'debug';
 const log = debug('app:components/PDFThumbnail');
 
+import visible from '../directives/visible';
+
 export default {
   name: 'PDFThumbnail',
 
@@ -40,10 +43,10 @@ export default {
       type: Boolean,
       default: false,
     },
-    isElementVisible: {
-      type: Boolean,
-      default: false,
-    },
+  },
+
+  directives: {
+    visible
   },
 
   data() {
@@ -129,10 +132,6 @@ export default {
     page: 'destroyPage',
     src: 'updateVisibility',
     scale: 'updateVisibility',
-
-    isElementVisible(isElementVisible) {
-      if (isElementVisible && !this.src) this.drawPage();
-    },
   },
 
   mounted() {

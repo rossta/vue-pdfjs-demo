@@ -12,9 +12,9 @@
       >
       <div
         class="scrolling-page"
-        slot-scope="{isElementVisible, isPageFocused, isElementFocused}"
+        slot-scope="{isPageFocused, isElementFocused}"
         >
-        <slot v-bind="{page, isElementVisible, isPageFocused, isElementFocused}"></slot>
+        <slot v-bind="{page, isPageFocused, isElementFocused}"></slot>
       </div>
     </ScrollingPage>
   </div>

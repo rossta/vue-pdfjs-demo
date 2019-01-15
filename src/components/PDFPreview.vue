@@ -6,8 +6,8 @@
     :is-parent-visible="isPreviewEnabled"
     >
     <PDFThumbnail
-      slot-scope="{page, isElementVisible, isPageFocused}"
-      v-bind="{scale, page, isElementVisible, isPageFocused}"
+      slot-scope="{page, isPageFocused}"
+      v-bind="{scale, page, isPageFocused}"
       @thumbnail-rendered="onThumbnailRendered"
       @thumbnail-errored="onThumbnailErrored"
       @page-focus="onPageFocused"

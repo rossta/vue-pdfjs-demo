@@ -49,13 +49,6 @@ export default {
       return elementTop < threshold && bottom >= threshold;
     },
 
-    isElementVisible() {
-      const {elementTop, bottom, elementHeight, scrollTop, scrollBottom} = this;
-      if (!elementHeight) return;
-
-      return elementTop < scrollBottom && bottom > scrollTop;
-    },
-
     bottom() {
       return this.elementTop + this.elementHeight;
     },
@@ -94,9 +87,8 @@ export default {
   },
 
   render() {
-    const {isElementVisible, isPageFocused, isElementFocused} = this;
+    const {isPageFocused, isElementFocused} = this;
     return this.$scopedSlots.default({
-      isElementVisible,
       isPageFocused,
       isElementFocused,
     });

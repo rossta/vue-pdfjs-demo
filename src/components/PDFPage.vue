@@ -1,8 +1,13 @@
+<template>
+  <canvas v-visible="drawPage" v-bind="canvasAttrs"></canvas>
+</template>
+
 <script>
 import debug from 'debug';
 const log = debug('app:components/PDFPage');
 
 import {PIXEL_RATIO} from '../utils/constants';
+import visible from '../directives/visible';
 
 export default {
   name: 'PDFPage',
@@ -24,14 +29,14 @@ export default {
       type: Boolean,
       default: false,
     },
-    isElementVisible: {
-      type: Boolean,
-      default: false,
-    },
     isElementFocused: {
       type: Boolean,
       default: false,
     },
+  },
+
+  directives: {
+    visible,
   },
 
   computed: {
@@ -130,10 +135,6 @@ export default {
     isElementFocused(isElementFocused) {
       if (isElementFocused) this.focusPage();
     },
-
-    isElementVisible(isElementVisible) {
-      if (isElementVisible) this.drawPage();
-    },
   },
 
   created() {
@@ -148,11 +149,6 @@ export default {
 
   beforeDestroy() {
     this.destroyPage(this.page);
-  },
-
-  render(h) {
-    const {canvasAttrs: attrs} = this;
-    return h('canvas', {attrs});
   },
 };
 </script>

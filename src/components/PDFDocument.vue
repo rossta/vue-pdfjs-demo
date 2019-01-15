@@ -9,8 +9,8 @@
     @pages-reset="fitWidth"
     >
     <PDFPage
-      slot-scope="{page, isElementVisible, isPageFocused, isElementFocused}"
-      v-bind="{scale, optimalScale, page, isElementVisible, isPageFocused, isElementFocused}"
+      slot-scope="{page, isPageFocused, isElementFocused}"
+      v-bind="{scale, optimalScale, page, isPageFocused, isElementFocused}"
       @page-rendered="onPageRendered"
       @page-errored="onPageErrored"
       @page-focus="onPageFocused"
