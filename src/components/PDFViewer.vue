@@ -29,7 +29,6 @@
       @document-rendered="onDocumentRendered"
       @document-errored="onDocumentErrored"
       >
-
       <PDFPreview
         slot="preview"
         slot-scope="{pages}"
