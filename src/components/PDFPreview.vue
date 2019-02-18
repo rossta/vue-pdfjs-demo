@@ -3,10 +3,10 @@
     class="pdf-preview"
     @pages-fetch="onPagesFetch"
     v-bind="{pages, pageCount, currentPage}"
+    v-slot="{page, isPageFocused}"
     :is-parent-visible="isPreviewEnabled"
     >
     <PDFThumbnail
-      slot-scope="{page, isPageFocused}"
       v-bind="{scale, page, isPageFocused}"
       @thumbnail-rendered="onThumbnailRendered"
       @thumbnail-errored="onThumbnailErrored"
