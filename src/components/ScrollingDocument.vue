@@ -7,11 +7,11 @@
       v-for="page in pages"
       :key="page.pageNumber"
       v-bind="{page, clientHeight, scrollTop, focusedPage, enablePageJump}"
+      v-slot="{isPageFocused, isElementFocused}"
       @page-jump="onPageJump"
       >
       <div
         class="scrolling-page"
-        slot-scope="{isPageFocused, isElementFocused}"
         >
         <slot v-bind="{page, isPageFocused, isElementFocused}"></slot>
       </div>

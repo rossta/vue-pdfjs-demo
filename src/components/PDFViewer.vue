@@ -29,23 +29,22 @@
       @document-rendered="onDocumentRendered"
       @document-errored="onDocumentErrored"
       >
+      <template v-slot:preview="{pages}">
+        <PDFPreview
+          v-show="isPreviewEnabled"
+          class="pdf-viewer__preview"
+          v-bind="{pages, scale, currentPage, pageCount, isPreviewEnabled}"
+          />
+      </template>
 
-      <PDFPreview
-        slot="preview"
-        slot-scope="{pages}"
-        v-show="isPreviewEnabled"
-        class="pdf-viewer__preview"
-        v-bind="{pages, scale, currentPage, pageCount, isPreviewEnabled}"
-        />
-
-      <PDFDocument
-        class="pdf-viewer__document"
-        :class="{ 'preview-enabled': isPreviewEnabled }"
-        slot="document"
-        slot-scope="{pages}"
-        v-bind="{pages, scale, optimalScale, fit, currentPage, pageCount, isPreviewEnabled}"
-        @scale-change="updateScale"
-        />
+      <template v-slot:document="{pages}">
+        <PDFDocument
+          class="pdf-viewer__document"
+          :class="{ 'preview-enabled': isPreviewEnabled }"
+          v-bind="{pages, scale, optimalScale, fit, currentPage, pageCount, isPreviewEnabled}"
+          @scale-change="updateScale"
+          />
+      </template>
     </PDFData>
   </div>
 </template>
