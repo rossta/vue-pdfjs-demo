@@ -1,3 +1,4 @@
+import 'intersection-observer'
 import debug from "debug"
 const log = debug("app:directives/visible")
 
