@@ -24,6 +24,7 @@
     <PDFData
       class="pdf-viewer__main"
       :url="url"
+      :bytes="bytes"
       @page-count="updatePageCount"
       @page-focus="updateCurrentPage"
       @document-rendered="onDocumentRendered"
@@ -77,6 +78,7 @@ export default {
 
   props: {
     url: String,
+    bytes: String
   },
 
   data() {
@@ -126,6 +128,9 @@ export default {
     url() {
       this.currentPage = undefined;
     },
+    bytes() {
+      this.currentPage = undefined;
+    }
   },
 
   mounted() {

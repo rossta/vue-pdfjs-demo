@@ -17,6 +17,13 @@ function getDocument(url) {
     'pdfjs-dist/webpack').then(pdfjs => pdfjs.getDocument(url));
 }
 
+function getDocumentFromBytes(bytes) {
+  let pdfData = Buffer.from(bytes, "base64").toString("binary");
+
+  return import(/* webpackChunkName: 'pdfjs-dist' */
+  "pdfjs-dist/webpack").then(pdfjs => pdfjs.getDocument({ data: pdfData }));
+}
+
 // pdf: instance of PDFData
 // see docs for PDF.js for more info
 function getPages(pdf, first, last) {
@@ -38,7 +45,11 @@ export default {
   props: {
     url: {
       type: String,
-      required: true,
+      required: false,
+    },
+    bytes: {
+      type: String,
+      required: false,
     },
   },
 
@@ -51,6 +62,9 @@ export default {
   watch: {
     url: {
       handler(url) {
+        if (typeof this.bytes !== undefined) {
+          return;
+        }
         getDocument(url)
           .then(pdf => (this.pdf = pdf))
           .catch(response => {
@@ -59,6 +73,25 @@ export default {
           });
       },
       immediate: true,
+    },
+
+    bytes: {
+      handler(bytes) {
+        if (typeof bytes === undefined || bytes === null || bytes === undefined) {
+          return;
+        }
+
+        getDocumentFromBytes(bytes)
+          .then(pdf => (this.pdf = pdf))
+          .catch(response => {
+            this.$emit("document-errored", {
+              text: "Failed to retrieve PDF",
+              response
+            });
+            log("Failed to retrieve PDF", response);
+          });
+      },
+      immediate: true
     },
 
     pdf(pdf, oldPdf) {
