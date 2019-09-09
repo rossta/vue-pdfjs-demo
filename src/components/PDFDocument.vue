@@ -47,7 +47,7 @@ export default {
     pdf: {
       handler(pdf) {
         this.pages = [];
-        const promises = range(1, pdf.numPages).map(number => pdf.getPage(number));
+        const promises = range(1, pdf.numPages + 1).map(number => pdf.getPage(number));
         return Promise.all(promises).
           then(pages => (this.pages = pages)).
           then(() => log('pages fetched'))
