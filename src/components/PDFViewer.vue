@@ -81,7 +81,7 @@ export default {
     httpHeaders: Object,
     selections: {
       type: Array,
-      default: []
+      default: () => []
     },
   },
 

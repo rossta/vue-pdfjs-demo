@@ -62,7 +62,7 @@ export default {
     },
     selections: {
       type: Array,
-      default: []
+      default: () => []
     },
   },
 
