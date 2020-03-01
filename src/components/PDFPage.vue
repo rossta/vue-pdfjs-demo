@@ -12,6 +12,7 @@ const log = debug('app:components/PDFPage');
 import {PIXEL_RATIO} from '../utils/constants';
 import visible from '../directives/visible';
 import { TextLayerBuilder } from 'pdfjs-dist/web/pdf_viewer'
+import {VIEWPORT_RATIO} from "../../../../../../pdf-viewer/utils/constants";
 import 'pdfjs-dist/web/pdf_viewer.css'
 import findAndReplaceDOMText from '../directives/findAndReplaceDOMText'
 
