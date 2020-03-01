@@ -24,6 +24,7 @@
     <PDFData
       class="pdf-viewer__main"
       :url="url"
+      :httpHeaders="httpHeaders"
       @page-count="updatePageCount"
       @page-focus="updateCurrentPage"
       @document-rendered="onDocumentRendered"
@@ -41,7 +42,7 @@
         <PDFDocument
           class="pdf-viewer__document"
           :class="{ 'preview-enabled': isPreviewEnabled }"
-          v-bind="{pages, scale, optimalScale, fit, currentPage, pageCount, isPreviewEnabled}"
+          v-bind="{pages, scale, optimalScale, fit, currentPage, pageCount, isPreviewEnabled, selections}"
           @scale-change="updateScale"
           />
       </template>
@@ -77,6 +78,11 @@ export default {
 
   props: {
     url: String,
+    httpHeaders: Object,
+    selections: {
+      type: Array,
+      default: () => []
+    },
   },
 
   data() {

@@ -8,10 +8,20 @@ const log = debug('app:components/PDFData');
 
 import range from 'lodash/range';
 
-function getDocument(url) {
-  // Using import statement in this way allows Webpack
-  // to treat pdf.js as an async dependency so we can
-  // avoid adding it to one of the main bundles
+function getDocument(url, httpHeaders) {
+
+    // Using import statement in this way allows Webpack
+    // to treat pdf.js as an async dependency so we can
+    // avoid adding it to one of the main bundles
+
+    if (httpHeaders) {
+        return import(
+            /* webpackChunkName: 'pdfjs-dist' */
+            'pdfjs-dist/webpack').then(pdfjs => pdfjs.getDocument({
+            url: url,
+            httpHeaders: httpHeaders,
+        }));
+    }
   return import(
     /* webpackChunkName: 'pdfjs-dist' */
     'pdfjs-dist/webpack').then(pdfjs => pdfjs.getDocument(url));
@@ -40,6 +50,10 @@ export default {
       type: String,
       required: true,
     },
+    httpHeaders: {
+      type: Object,
+      required: false,
+    },
   },
 
   data() {
@@ -51,7 +65,7 @@ export default {
   watch: {
     url: {
       handler(url) {
-        getDocument(url)
+        getDocument(url, this.httpHeaders)
           .then(pdf => (this.pdf = pdf))
           .catch(response => {
             this.$emit('document-errored', {text: 'Failed to retrieve PDF', response});
