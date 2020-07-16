@@ -11,7 +11,7 @@
     "debug": "^3.2.6",
     "filestack-js": "^0.11.4",
     "intersection-observer": "^0.5.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "pdfjs-dist": "^2.0.943",
     "vue": "^2.6.3"
   },
